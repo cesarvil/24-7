@@ -1,8 +1,10 @@
 import styled from "styled-components";
-import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 
 const Schedule = () => {
+  const [allDays, setAllDays] = useState(null);
+  const [lastId, setLastId] = useState(null);
+  //delete later
   const days = [
     {
       _id: 20220425,
@@ -406,7 +408,22 @@ const Schedule = () => {
     },
   ];
 
-  const handleClick = () => {
+  useEffect(() => {
+    //fetching all days and putting them in state
+    const getAllDays = () => {
+      fetch("api/days")
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          setAllDays(data.data);
+        })
+        .catch((err) => console.log(err));
+    };
+    getAllDays();
+  }, [lastId]);
+
+  const handleAddWeek = () => {
+    //function to add more weeks when clicking the add week button
     console.log("data");
     fetch("/api/add-week", {
       method: "POST",
@@ -416,20 +433,18 @@ const Schedule = () => {
         Accept: "application/json",
       },
     })
-      .then((response) => {
-        console.log(response);
-        if (!response.ok) {
-          throw new Error(`Error status: ${response.status}`);
-        }
-        response.json();
+      .then((res) => {
+        console.log(res); // delete later
+        return res.json();
       })
       .then((data) => {
-        console.log(data);
+        setLastId(data.lastDay_Id);
       })
       .catch((err) => console.log(err));
   };
 
   const idToDate = (dateId) => {
+    // delete
     const dateString = dateId.toString();
     const year = +dateString.substring(0, 4);
     const month = +dateString.substring(4, 6);
@@ -441,11 +456,12 @@ const Schedule = () => {
   };
 
   const nextDay = (date) => {
+    // delete
     let nextDay = new Date(date);
     nextDay.setDate(date.getDate() + 1);
     console.log(nextDay);
   };
-
+  //delete later
   const addWeek = () => {
     let last_Id = days[days.length - 1]._id + 1;
     for (let i = 0; i < 7; i++) {
@@ -472,43 +488,47 @@ const Schedule = () => {
     }
   };
 
-  idToDate(20220425);
-  addWeek();
+  // idToDate(20220425);
+  // addWeek();
 
   return (
     <Wrapper>
-      <button onClick={() => handleClick()}>Add Week</button>
-      {days.map((notUsing, index) => {
-        if (index % 7 === 0) {
-          return (
-            <Week>
-              {days.slice(index, index + 7).map((day) => {
-                return (
-                  <Day>
-                    <span>{day._id}</span>
-                    <span>weekday</span>
-                    <Shift>
-                      <span>{day.shift1.name}</span>
-                      <span>{day.shift1.start}</span>
-                      <span>{day.shift1.end}</span>
-                    </Shift>
-                    <Shift>
-                      <span>{day.shift2.name}</span>
-                      <span>{day.shift2.start}</span>
-                      <span>{day.shift2.end}</span>
-                    </Shift>
-                    <Shift>
-                      <span>{day.shift3.name}</span>
-                      <span>{day.shift3.start}</span>
-                      <span>{day.shift3.end}</span>
-                    </Shift>
-                  </Day>
-                );
-              })}
-            </Week>
-          );
-        }
-      })}
+      <button onClick={() => handleAddWeek()}>Add Week</button>
+      {allDays !== null &&
+        allDays
+          .filter((_, index) => index % 7 === 0) // amount of weeks. just using the index.
+          .map((_, index) => {
+            return (
+              <Week key={`Week-${index + 1}`}>
+                {
+                  //index times 7 to match the index in days.
+                  allDays.slice(index * 7, index * 7 + 7).map((day) => {
+                    return (
+                      <Day key={`Day-${day._id}`}>
+                        <span>{day._id}</span>
+                        <Weekdays>weekday</Weekdays>
+                        <Shift>
+                          <span>{day.shift1.name}</span>
+                          <span>{day.shift1.start}</span>
+                          <span>{day.shift1.end}</span>
+                        </Shift>
+                        <Shift>
+                          <span>{day.shift2.name}</span>
+                          <span>{day.shift2.start}</span>
+                          <span>{day.shift2.end}</span>
+                        </Shift>
+                        <Shift>
+                          <span>{day.shift3.name}</span>
+                          <span>{day.shift3.start}</span>
+                          <span>{day.shift3.end}</span>
+                        </Shift>
+                      </Day>
+                    );
+                  })
+                }
+              </Week>
+            );
+          })}
     </Wrapper>
   );
 };

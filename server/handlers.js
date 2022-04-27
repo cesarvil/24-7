@@ -1,4 +1,5 @@
 const { MongoClient, ObjectId } = require("mongodb");
+const { format } = require("date-fns");
 require("dotenv").config();
 const { MONGO_URI } = process.env;
 // const ObjectId = require("mongodb").ObjectId;
@@ -10,7 +11,7 @@ const options = {
 
 const dateToId = (date) => {
   //converts a date to date _id
-  var dd = String(date.getDate()).padStart(2, "0"); // padstart used to fill with 0s if the intenger is  < 10
+  var dd = String(date.getDate()).padStart(2, "0"); // padstart used to fill with 0s if the intenger is  <
   var mm = String(date.getMonth() + 1).padStart(2, "0"); //month 0 to 11
   var yyyy = date.getFullYear();
 
@@ -42,7 +43,7 @@ const addSubstractDays = (date, val = 0) => {
   //gets next day in date format from a date
   let newDay = new Date(date);
   newDay.setDate(newDay.getDate() + val);
-  // console.log(date, newDay);
+  console.log(format(newDay, "EEEE · MMM dd yyyy"));
   return newDay;
 };
 
@@ -73,6 +74,32 @@ const getLast_Id = async () => {
   return last_Id[0]._id;
 };
 
+const getAllDays = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+
+  try {
+    await client.connect();
+    const db = client.db("24-7");
+    const data = await db.collection("days").find().toArray();
+    if (data.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        error: "No shifts in the database",
+      });
+    } else {
+      res
+        .status(200)
+        .json({ status: 200, data, message: "All shifts are shown" });
+    }
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ status: 500, data: req.body, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
 const addWeek = async (req, res) => {
   let lastDay_Id = (await getLast_Id()) + 1;
   const client = new MongoClient(MONGO_URI, options);
@@ -80,10 +107,13 @@ const addWeek = async (req, res) => {
   try {
     await client.connect();
     const db = client.db("24-7");
-    for (let i = 0; i < 3; i++) {
-      let dayAdded = await db.collection("days").insertOne({
+    for (let i = 0; i < 7; i++) {
+      await db.collection("days").insertOne({
         _id: lastDay_Id,
-        date: "x",
+        date: {
+          weekday: format(idToDate(lastDay_Id), "EEEE"),
+          dayMonth: format(idToDate(lastDay_Id), "MMM dd"),
+        },
         shift1: {
           name: "x",
           start: "x",
@@ -103,26 +133,58 @@ const addWeek = async (req, res) => {
       lastDay_Id = incrementId(lastDay_Id);
     }
 
-    return res.status(200).json({
+    res.status(200).json({
       status: 200,
       success: true,
+      lastDay_Id: lastDay_Id,
     });
   } catch (err) {
     console.error(err);
-    console.log("Test");
 
-    return res.status(500).json({ status: 500, message: err.message });
+    res.status(500).json({ status: 500, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
+const modifyShift = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+
+  try {
+    await client.connect();
+    const db = client.db("24-7");
+
+    await db.collection("days").updateOne(
+      { _id: 20220428 },
+      {
+        $set: {
+          "shift1.name": "Cesar",
+          "shift1.start": "10am",
+          "shift1.end": "10pm",
+        },
+      }
+    );
+    //testing, TODO
+    //   return res.status(200).json({
+    //     status: 200,
+    //     success: true,
+    //   });
+    // } catch (err) {
+    //   console.error(err);
+    //   console.log("Test");
+
+    //   return res.status(500).json({ status: 500, message: err.message });
   } finally {
     client.close();
   }
 };
 
 // dbFunction("24-7");
-getLast_Id();
+// getLast_Id();
+// modifyShift();
 
 //exports all the endpoints
 module.exports = {
-  addDay,
   getAllDays,
   addWeek,
 };
