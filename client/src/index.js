@@ -1,12 +1,24 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import App from "../src/Components/App";
+import { createRoot } from "react-dom/client";
 
-ReactDOM.render(
+const container = document.getElementById("app");
+const root = createRoot(container);
+root.render(
   <React.StrictMode>
-    {/* <ProjectProvider> */}
     <App />
-    {/* </ProjectProvider> */}
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 );
+
+// import React from "react";
+// import ReactDOM from "react-dom";
+// import App from "../src/Components/App";
+
+// ReactDOM.render(
+//   <React.StrictMode>
+//     {/* <ProjectProvider> */}
+//     <App />
+//     {/* </ProjectProvider> */}
+//   </React.StrictMode>,
+//   document.getElementById("root")
+// );

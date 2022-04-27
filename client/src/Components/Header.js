@@ -1,6 +1,5 @@
 import styled from "styled-components";
-import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
 import { breakpoints } from "./GlobalStyles";
 
 const Header = () => {
