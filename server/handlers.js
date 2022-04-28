@@ -21,7 +21,7 @@ const dateToId = (date) => {
 };
 
 const incrementId = (id) => {
-  // increment id from an id following the calendar dates
+  // increment id from an id following the calendar dates (months ending in 28 30 31)
   let newId = idToDate(id);
   newId = addSubstractDays(newId, 1);
   newId = dateToId(newId);
@@ -42,8 +42,8 @@ const idToDate = (dateId) => {
 const addSubstractDays = (date, val = 0) => {
   //gets next day in date format from a date
   let newDay = new Date(date);
-  newDay.setDate(newDay.getDate() + val);
-  console.log(format(newDay, "EEEE · MMM dd yyyy"));
+  newDay.setDate(newDay.getDate() + val); // val adds removes days
+  // console.log(format(newDay, "EEEE · MMM dd yyyy"));
   return newDay;
 };
 
@@ -62,8 +62,14 @@ const getLast_Id = async () => {
 
   client.close();
   if (last_Id.length === 0) {
+    let daysToSubstract = -1;
     //getting an Id from todays date when there is nothing in the backend
-    last_Id = addSubstractDays(new Date(), -1);
+    do {
+      last_Id = addSubstractDays(new Date(), daysToSubstract);
+      daysToSubstract--;
+    } while (format(last_Id, "EEEE") !== "Sunday");
+    // need to substract an additional time to match the date when because of the increment in the for loop in the addWeek function
+    last_Id = addSubstractDays(new Date(), daysToSubstract);
     last_Id = dateToId(last_Id);
 
     //create new week from todays week TODO
@@ -92,22 +98,45 @@ const getAllDays = async (req, res) => {
         .json({ status: 200, data, message: "All shifts are shown" });
     }
   } catch (err) {
-    return res
-      .status(500)
-      .json({ status: 500, data: req.body, message: err.message });
+    return res.status(500).json({ status: 500, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
+const deleteAll = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+
+  try {
+    await client.connect();
+    const db = client.db("24-7");
+    const data = await db.collection("days").deleteMany({});
+    if (!data.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        error: "No shifts in the database",
+      });
+    } else {
+      res
+        .status(200)
+        .json({ status: 200, data, message: "All shifts deleted" });
+    }
+  } catch (err) {
+    return res.status(500).json({ status: 500, message: err.message });
   } finally {
     client.close();
   }
 };
 
 const addWeek = async (req, res) => {
-  let lastDay_Id = (await getLast_Id()) + 1;
+  let lastDay_Id = await getLast_Id();
   const client = new MongoClient(MONGO_URI, options);
 
   try {
     await client.connect();
     const db = client.db("24-7");
     for (let i = 0; i < 7; i++) {
+      lastDay_Id = incrementId(lastDay_Id);
       await db.collection("days").insertOne({
         _id: lastDay_Id,
         date: {
@@ -115,22 +144,21 @@ const addWeek = async (req, res) => {
           dayMonth: format(idToDate(lastDay_Id), "MMM dd"),
         },
         shift1: {
-          name: "x",
-          start: "x",
-          end: "x",
+          name: "Placeholder",
+          start: "10am",
+          end: "10am",
         },
         shift2: {
-          name: "x",
-          start: "x",
-          end: "x",
+          name: "Placeholder",
+          start: "10am",
+          end: "10am",
         },
         shift3: {
-          name: "x",
-          start: "x",
-          end: "x",
+          name: "Placeholder",
+          start: "10am",
+          end: "10am",
         },
       });
-      lastDay_Id = incrementId(lastDay_Id);
     }
 
     res.status(200).json({
@@ -179,6 +207,39 @@ const modifyShift = async (req, res) => {
   }
 };
 
+const modifyShiftName = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  const _id = req.body._id;
+  const shift = req.body.shift;
+  const employeeName = req.body.name;
+  let shiftName = req.body.shiftName;
+  shiftName = `${shift}.${shiftName}`; // target the document shiftx.name
+  try {
+    await client.connect();
+    const db = client.db("24-7");
+
+    await db.collection("days").updateOne(
+      { _id: _id },
+      {
+        $set: {
+          [shiftName]: employeeName,
+        },
+      }
+    );
+    res.status(200).json({
+      status: 200,
+      success: true,
+    });
+  } catch (err) {
+    console.error(err);
+    console.log("Test");
+
+    return res.status(500).json({ status: 500, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
 // dbFunction("24-7");
 // getLast_Id();
 // modifyShift();
@@ -187,4 +248,6 @@ const modifyShift = async (req, res) => {
 module.exports = {
   getAllDays,
   addWeek,
+  deleteAll,
+  modifyShiftName,
 };

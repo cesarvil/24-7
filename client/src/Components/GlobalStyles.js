@@ -2,6 +2,18 @@ import { createGlobalStyle } from "styled-components";
 
 export const breakpoints = { tablet: "768px" }; //@media only screen and (min-device-width : 768px)
 
+export const employeeColors = {
+  navy: "#001f3f",
+  blue: "#0074D9",
+  teal: "#22bab5",
+  yellow: "#FFDC00",
+  purple: "#B10DC9",
+  maroon: "#85144b",
+  silver: "#DDDDDD",
+  red: "#FF4136",
+  orange: "#FF851B",
+};
+
 export default createGlobalStyle`
     :root {
       --primary-color: #145173;
