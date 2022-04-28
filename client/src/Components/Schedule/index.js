@@ -1,412 +1,15 @@
 import styled from "styled-components";
 import React, { useEffect, useState } from "react";
 
+//ask about post vs get
+// refresh on variable change
+
+import { employeeColors } from "../GlobalStyles";
+
 const Schedule = () => {
   const [allDays, setAllDays] = useState(null);
   const [lastId, setLastId] = useState(null);
-  //delete later
-  const days = [
-    {
-      _id: 20220425,
-      date: "2022 April 25",
-      shift1: {
-        name: "cesar",
-        start: "2am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220426,
-      date: "april 22 2021",
-      shift1: {
-        name: "cesar",
-        start: "1am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-
-    {
-      _id: 20220427,
-      date: "2022 April 25",
-      shift1: {
-        name: "cesar",
-        start: "2am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220428,
-      date: "april 22 2021",
-      shift1: {
-        name: "cesar",
-        start: "1am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220429,
-      date: "2022 April 25",
-      shift1: {
-        name: "cesar",
-        start: "2am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220430,
-      date: "april 22 2021",
-      shift1: {
-        name: "cesar",
-        start: "1am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220501,
-      date: "2022 April 25",
-      shift1: {
-        name: "cesar",
-        start: "2am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220502,
-      date: "april 22 2021",
-      shift1: {
-        name: "cesar",
-        start: "1am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220503,
-      date: "2022 April 25",
-      shift1: {
-        name: "cesar",
-        start: "2am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220504,
-      date: "april 22 2021",
-      shift1: {
-        name: "cesar",
-        start: "1am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220505,
-      date: "2022 April 25",
-      shift1: {
-        name: "cesar",
-        start: "2am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220506,
-      date: "april 22 2021",
-      shift1: {
-        name: "cesar",
-        start: "1am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220507,
-      date: "2022 April 25",
-      shift1: {
-        name: "cesar",
-        start: "2am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220508,
-      date: "april 22 2021",
-      shift1: {
-        name: "cesar",
-        start: "1am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220509,
-      date: "2022 April 25",
-      shift1: {
-        name: "cesar",
-        start: "2am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220510,
-      date: "april 22 2021",
-      shift1: {
-        name: "cesar",
-        start: "1am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220511,
-      date: "2022 April 25",
-      shift1: {
-        name: "cesar",
-        start: "2am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220512,
-      date: "april 22 2021",
-      shift1: {
-        name: "cesar",
-        start: "1am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220513,
-      date: "2022 April 25",
-      shift1: {
-        name: "cesar",
-        start: "2am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220514,
-      date: "april 22 2021",
-      shift1: {
-        name: "cesar",
-        start: "1am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-    {
-      _id: 20220515,
-      date: "april 22 2021",
-      shift1: {
-        name: "cesar",
-        start: "1am",
-        end: "10am",
-      },
-      shift2: {
-        name: "peter",
-        start: "10am",
-        end: "5pm",
-      },
-      shift3: {
-        name: "carl",
-        start: "5pm",
-        end: "1am",
-      },
-    },
-  ];
+  const [name, setName] = useState("placeholder");
 
   useEffect(() => {
     //fetching all days and putting them in state
@@ -414,7 +17,6 @@ const Schedule = () => {
       fetch("api/days")
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
           setAllDays(data.data);
         })
         .catch((err) => console.log(err));
@@ -425,7 +27,7 @@ const Schedule = () => {
   const handleAddWeek = () => {
     //function to add more weeks when clicking the add week button
     console.log("data");
-    fetch("/api/add-week", {
+    fetch("/api/new-week", {
       method: "POST",
       body: JSON.stringify({}),
       headers: {
@@ -439,6 +41,62 @@ const Schedule = () => {
       })
       .then((data) => {
         setLastId(data.lastDay_Id);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const handleDeleteAll = () => {
+    //function to add more weeks when clicking the add week button
+    fetch("/api/schedule-deletion", {
+      method: "POST",
+      body: JSON.stringify({}),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then((res) => {
+        console.log(res); // delete later
+        return res.json();
+      })
+      .then((data) => {
+        setLastId(data.lastDay_Id);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const handleShiftNameChange = (name, _id, shift, shiftName) => {
+    let x = "shift1.name";
+    fetch("/api/shift-name", {
+      method: "POST",
+      body: JSON.stringify({
+        name: name,
+        _id: _id,
+        shift: shift,
+        shiftName: shiftName,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then((res) => {
+        console.log(res); // delete later
+        return res.json();
+      })
+      .then((data) => {
+        console.log(allDays); // need to work here to rerender,stopping here.
+        // setAllDays(
+        //   [...allDays].map((day) => {
+        //     if (day._id === _id) {
+        //       console.log("match");
+        //       return {
+        //         ...day,
+        //         [x]: "mmmmm",
+        //       };
+        //     } else return day;
+        //   })
+        // );
       })
       .catch((err) => console.log(err));
   };
@@ -461,40 +119,14 @@ const Schedule = () => {
     nextDay.setDate(date.getDate() + 1);
     console.log(nextDay);
   };
-  //delete later
-  const addWeek = () => {
-    let last_Id = days[days.length - 1]._id + 1;
-    for (let i = 0; i < 7; i++) {
-      days.push({
-        _id: last_Id,
-        date: "april 22 2021",
-        shift1: {
-          name: "cesar",
-          start: "1am",
-          end: "10am",
-        },
-        shift2: {
-          name: "peter",
-          start: "10am",
-          end: "5pm",
-        },
-        shift3: {
-          name: "carl",
-          start: "5pm",
-          end: "1am",
-        },
-      });
-      last_Id++;
-    }
-  };
-
   // idToDate(20220425);
-  // addWeek();
 
   return (
     <Wrapper>
       <button onClick={() => handleAddWeek()}>Add Week</button>
+      <button onClick={() => handleDeleteAll()}>Delete all</button>
       {allDays !== null &&
+        allDays &&
         allDays
           .filter((_, index) => index % 7 === 0) // amount of weeks. just using the index.
           .map((_, index) => {
@@ -505,22 +137,42 @@ const Schedule = () => {
                   allDays.slice(index * 7, index * 7 + 7).map((day) => {
                     return (
                       <Day key={`Day-${day._id}`}>
-                        <span>{day._id}</span>
-                        <Weekdays>weekday</Weekdays>
-                        <Shift>
-                          <span>{day.shift1.name}</span>
-                          <span>{day.shift1.start}</span>
-                          <span>{day.shift1.end}</span>
+                        <DayMonth>{day.date.dayMonth}</DayMonth>
+                        <Weekdays>{day.date.weekday}</Weekdays>
+                        <Shift bColor={employeeColors.blue}>
+                          <Name>
+                            <span>{day.shift1.name}</span>
+                            <Select
+                              defaultValue={"DEFAULT"}
+                              onChange={(ev) =>
+                                handleShiftNameChange(
+                                  ev.target.value,
+                                  day._id,
+                                  "shift1",
+                                  "name"
+                                )
+                              }
+                              onBlur={(ev) => (ev.target.value = "DEFAULT")}
+                            >
+                              <option value={"DEFAULT"} disabled>
+                                {day.shift1.name}
+                              </option>
+                              <option value={"test"}>test</option>
+                              <option value={"test2"}>test2</option>
+                            </Select>
+                          </Name>
+                          <Hours>{day.shift1.start}</Hours>
+                          <Hours>{day.shift1.end}</Hours>
                         </Shift>
                         <Shift>
-                          <span>{day.shift2.name}</span>
-                          <span>{day.shift2.start}</span>
-                          <span>{day.shift2.end}</span>
+                          <Name>{day.shift2.name}</Name>
+                          <Hours>{day.shift2.start}</Hours>
+                          <Hours>{day.shift2.end}</Hours>
                         </Shift>
                         <Shift>
-                          <span>{day.shift3.name}</span>
-                          <span>{day.shift3.start}</span>
-                          <span>{day.shift3.end}</span>
+                          <Name>{day.shift3.name}</Name>
+                          <Hours>{day.shift3.start}</Hours>
+                          <Hours>{day.shift3.end}</Hours>
                         </Shift>
                       </Day>
                     );
@@ -544,24 +196,77 @@ const Week = styled.div`
   border: 1px gray solid;
 `;
 
-const Weekdays = styled.div`
+const DayMonth = styled.div`
   display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px gray solid;
 `;
 
-const Day = styled.div`
+const Weekdays = styled.div`
   display: flex;
-  flex-direction: column;
-  margin: 20px;
+  justify-content: center;
+  align-items: center;
+  border: 1px gray solid;
 `;
 
 const Shift = styled.div`
   display: flex;
   border: 1px gray solid;
   padding: 5px;
-
+  background: ${(props) => props.bColor};
   span {
     margin: 5px;
   }
+`;
+
+const Day = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: 20px;
+  border: 1px gray solid;
+`;
+
+const Hours = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2px;
+  border: 1px gray solid;
+`;
+
+const Name = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2px;
+  border: 1px gray solid;
+  overflow: initial;
+  width: 90px;
+  height: 30px;
+
+  &:hover {
+    span {
+      display: none;
+    }
+    select {
+      width: 100%;
+      height: 100%;
+      display: initial;
+      appearance: none;
+      padding: 5px;
+      background-color: black;
+      color: white;
+      border: none;
+      font-family: inherit;
+      outline: none;
+    }
+  }
+`;
+
+const Select = styled.select`
+  display: none;
 `;
 
 export default Schedule;
