@@ -68,7 +68,7 @@ const getLast_Id = async () => {
       last_Id = addSubstractDays(new Date(), daysToSubstract);
       daysToSubstract--;
     } while (format(last_Id, "EEEE") !== "Sunday");
-    // need to substract an additional time to match the date when because of the increment in the for loop in the addWeek function
+    // need to substract an additional time to match the date because of the increment in the for loop in the addWeek function
     last_Id = addSubstractDays(new Date(), daysToSubstract);
     last_Id = dateToId(last_Id);
 
@@ -145,18 +145,18 @@ const addWeek = async (req, res) => {
         },
         shift1: {
           name: "Placeholder",
-          start: "10am",
-          end: "10am",
+          start: "12am",
+          end: "8am",
         },
         shift2: {
           name: "Placeholder",
-          start: "10am",
-          end: "10am",
+          start: "8am",
+          end: "4pm",
         },
         shift3: {
           name: "Placeholder",
-          start: "10am",
-          end: "10am",
+          start: "4pm",
+          end: "12am",
         },
       });
     }
@@ -218,7 +218,7 @@ const modifyShiftName = async (req, res) => {
     await client.connect();
     const db = client.db("24-7");
 
-    await db.collection("days").updateOne(
+    const newName = await db.collection("days").updateOne(
       { _id: _id },
       {
         $set: {
@@ -229,6 +229,7 @@ const modifyShiftName = async (req, res) => {
     res.status(200).json({
       status: 200,
       success: true,
+      employeeName: employeeName,
     });
   } catch (err) {
     console.error(err);
@@ -240,8 +241,112 @@ const modifyShiftName = async (req, res) => {
   }
 };
 
+const getDay = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  const _id = Number(req.params._id);
+  console.log(_id);
+  try {
+    await client.connect();
+    const db = client.db("24-7");
+    const data = await db
+      .collection("days")
+      .find({ _id: _id })
+      .limit(1)
+      .toArray();
+    if (data.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        error: "No shifts in the database",
+      });
+    } else {
+      console.log(data[0]);
+      res
+        .status(200)
+        .json({ status: 200, data, message: "All shifts are shown" });
+    }
+  } catch (err) {
+    return res.status(500).json({ status: 500, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
+const addUser = async (req, res) => {
+  let lastDay_Id = await getLast_Id();
+  const { username, userColor } = req.body;
+  const client = new MongoClient(MONGO_URI, options);
+
+  try {
+    await client.connect();
+    const db = client.db("24-7");
+    //getting last Id and next id
+    let last_Id = await db
+      .collection("users")
+      .find({})
+      .sort({ _id: -1 })
+      .limit(1)
+      .toArray();
+
+    if (last_Id.length === 0) {
+      last_Id = 100;
+    } else {
+      last_Id = last_Id[0]._id;
+      console.log(last_Id);
+    }
+
+    last_Id++;
+    /////////////////////
+
+    await db.collection("users").insertOne({
+      _id: last_Id,
+      username: username,
+      userColor: userColor,
+    });
+
+    res.status(200).json({
+      status: 200,
+      success: true,
+      userColor: userColor,
+    });
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({ status: 500, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
+const getUsedColors = async (req, res) => {
+  let lastDay_Id = await getLast_Id();
+  const { username, userColor } = req.body;
+  const client = new MongoClient(MONGO_URI, options);
+
+  try {
+    await client.connect();
+    const db = client.db("24-7");
+
+    //returns an array of default colors already in use.
+    let colorsUsed = await db.collection("users").find().toArray();
+
+    colorsUsed = colorsUsed.map((user) => user.userColor);
+
+    res.status(200).json({
+      status: 200,
+      success: true,
+      colorsUsed: colorsUsed,
+    });
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({ status: 500, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
 // dbFunction("24-7");
-// getLast_Id();
+getLast_Id();
 // modifyShift();
 
 //exports all the endpoints
@@ -250,4 +355,7 @@ module.exports = {
   addWeek,
   deleteAll,
   modifyShiftName,
+  getDay,
+  addUser,
+  getUsedColors,
 };

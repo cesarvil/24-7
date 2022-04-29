@@ -3,6 +3,7 @@ import GlobalStyles from "./GlobalStyles";
 import styled from "styled-components";
 import Header from "./Header";
 import Homepage from "./Homepage";
+import Profile from "./Profile";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Wrapper>
         <Routes>
           <Route path="/" exact element={<Homepage />} />
+          <Route path="/Profile" element={<Profile />} />
         </Routes>
       </Wrapper>
     </Router>
