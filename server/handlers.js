@@ -56,7 +56,7 @@ const getLast_Id = async () => {
   let last_Id = await db
     .collection("days")
     .find({})
-    .sort({ _id: -1 })
+    .sort({ _id: -1 }) // -1 reverses the sort order.
     .limit(1)
     .toArray();
 
