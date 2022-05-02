@@ -3,6 +3,16 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
+
+const {
+  Signup,
+  Login,
+  Activate,
+  Logout,
+  getUserInfo,
+} = require("./src/users/user.controller"); //stopping here
+const { validateToken } = require("./middlewares/validateToken");
+
 const {
   getAllDays,
   addWeek,
@@ -30,6 +40,12 @@ express()
 
   .post("/api/new-user", addUser) // add new user
   .get("/api/colors", getUsedColors) // gets all days
+
+  .post("/api/new-user2", Signup) // add new user
+  .post("/api/login", Login) // add new user
+  .patch("/api/activation", Activate) // add new user
+  .get("/api/user-info", validateToken, getUserInfo) //validate token is a middleware,
+  .get("/api/logout", validateToken, Logout)
 
   .use((req, res) => res.status(404).type("txt").send("🤷‍♂️"))
 
