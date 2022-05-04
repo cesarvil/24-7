@@ -21,6 +21,7 @@ const {
   getDay,
   addUser,
   getUsedColors,
+  createSchedule,
 } = require("./handlers");
 
 const PORT = process.env.PORT || 8000;
@@ -41,12 +42,12 @@ express()
   .post("/api/new-user", addUser) // add new user
   .get("/api/colors", getUsedColors) // gets all days
 
-  .post("/api/new-user2", Signup) // add new user
+  .post("/api/signup", Signup) // add new user
   .post("/api/login", Login) // add new user
   .patch("/api/activation", Activate) // add new user
   .get("/api/user-info", validateToken, getUserInfo) //validate token is a middleware,
   .get("/api/logout", validateToken, Logout)
-
+  .get("/api/new-schedule", createSchedule) // new Collection
   .use((req, res) => res.status(404).type("txt").send("🤷‍♂️"))
 
   .listen(PORT, () => console.log(`Listening on port ${PORT}`));

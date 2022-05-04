@@ -9,14 +9,18 @@ const userSchema = new Schema(
     email: { type: String, required: true, unique: true },
     active: { type: Boolean, default: false },
     password: { type: String, required: true },
-    resetPasswordToken: { type: String, default: null },
-    resetPasswordExpires: { type: Date, default: null },
+    // resetPasswordToken: { type: String, default: null },
+    // resetPasswordExpires: { type: Date, default: null }, maybe later if type allows it
     emailToken: { type: String, default: null },
     emailTokenExpires: { type: Date, default: null },
     accessToken: { type: String, default: null },
     firstName: { type: String, required: true },
     surname: { type: String, required: true },
+    // isAdmin: { type: Boolean, default: false },
   },
+
+  // "isAdmin" : true,
+  // "scheduleName": "redfern"
   {
     timestamps: {
       createdAt: "createdAt",
