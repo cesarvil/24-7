@@ -345,6 +345,35 @@ const getUsedColors = async (req, res) => {
   }
 };
 
+const createSchedule = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  const newSchedule = req.body.schedule; // add it to listcollection and createcollection
+  try {
+    // const  user = await User.findOne({ userId: id });
+    await client.connect();
+    const db = client.db("24-7");
+    //verify that the schedule name does not exist
+    let x = await db.listCollections({ name: "customers" }).toArray();
+    console.log(x.length);
+
+    if (x.length > 0) {
+      return res.status(400).json({
+        error: true,
+        message: "Collection alraedy exists",
+      });
+    }
+    //create new collection
+    await db.createCollection("customers");
+    res.send({ success: true, message: `Collection created` });
+  } catch (error) {
+    console.error("user-logout-error", error);
+    return res.status(500).json({
+      error: true,
+      message: error.message,
+    });
+  }
+};
+
 // dbFunction("24-7");
 getLast_Id();
 // modifyShift();
@@ -358,4 +387,5 @@ module.exports = {
   getDay,
   addUser,
   getUsedColors,
+  createSchedule,
 };

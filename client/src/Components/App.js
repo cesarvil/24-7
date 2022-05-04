@@ -4,6 +4,9 @@ import styled from "styled-components";
 import Header from "./Header";
 import Homepage from "./Homepage";
 import Profile from "./Profile";
+import Schedule from "./Schedule";
+import Signup from "./Signup";
+import Login from "./Login";
 
 function App() {
   return (
@@ -13,7 +16,10 @@ function App() {
       <Wrapper>
         <Routes>
           <Route path="/" exact element={<Homepage />} />
-          <Route path="/Profile" element={<Profile />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/schedule" element={<Schedule />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </Wrapper>
     </Router>

@@ -14,10 +14,50 @@ const options = {
 //Use Joi to validate user schema
 const userSchema = Joi.object().keys({
   email: Joi.string().email({ minDomainSegments: 2 }),
-  password: Joi.string().required().min(4),
-  confirmPassword: Joi.string().valid(Joi.ref("password")).required(),
-  firstName: Joi.string().required().min(4),
-  surname: Joi.string().min(4),
+  password: Joi.string()
+    .required()
+    .min(4)
+    .error((errors) => {
+      errors.some((err) => {
+        if (err.code === "string.min") {
+          err.message = `Password should have at least ${err.local.limit} characters!`;
+        }
+      });
+      return errors;
+    }),
+  confirmPassword: Joi.string()
+    .valid(Joi.ref("password"))
+    .required()
+    .error((errors) => {
+      errors.some((err) => {
+        if (err.code === "any.only") {
+          err.message = "Passwords must match";
+        }
+      });
+      console.log(errors);
+      return errors;
+    }),
+  firstName: Joi.string()
+    .required()
+    .min(3)
+    .error((errors) => {
+      errors.some((err) => {
+        if (err.code === "string.min") {
+          err.message = `First Name should have at least ${err.local.limit} characters!`;
+        }
+      });
+      return errors;
+    }),
+  surname: Joi.string()
+    .min(3)
+    .error((errors) => {
+      errors.some((err) => {
+        if (err.code === "string.min") {
+          err.message = `Surname should have at least ${err.local.limit} characters!`;
+        }
+      });
+      return errors;
+    }),
 });
 
 const Signup = async (req, res) => {
@@ -26,7 +66,6 @@ const Signup = async (req, res) => {
     //validation
     const result = userSchema.validate(req.body);
     if (result.error) {
-      console.log(result.error.message);
       return res.json({
         error: true,
         status: 400,
@@ -65,7 +104,7 @@ const Signup = async (req, res) => {
     await newUser.save();
     return res.status(200).json({
       success: true,
-      message: "Registration Success",
+      message: `User ${result.value.email} successfully registered. Please check your email for the activation code which must be entered the first time you log in to activate your account.`,
     });
   } catch (error) {
     console.error("signup-error", error);
@@ -141,8 +180,8 @@ const Login = async (req, res) => {
 const Activate = async (req, res) => {
   try {
     mongoose.connect(process.env.MONGO_URI, options);
-    const { email, code } = req.body;
-    if (!email || !code) {
+    const { email, activationCode } = req.body;
+    if (!email || !activationCode) {
       return res.json({
         error: true,
         status: 400,
@@ -151,7 +190,7 @@ const Activate = async (req, res) => {
     }
     const user = await User.findOne({
       email: email,
-      emailToken: code,
+      emailToken: activationCode,
       emailTokenExpires: { $gt: Date.now() }, // check if the code is expired (vs Date.now() + 60 * 1000 * 15)
     });
     console.log(user);
@@ -196,7 +235,7 @@ const Logout = async (req, res) => {
     return res.send({ success: true, message: "User Logged out" });
   } catch (error) {
     console.error("user-logout-error", error);
-    return res.stat(500).json({
+    return res.status(500).json({
       error: true,
       message: error.message,
     });
@@ -207,19 +246,14 @@ const getUserInfo = async (req, res) => {
   try {
     console.log("getuserinfo");
     mongoose.connect(process.env.MONGO_URI, options);
-    const { id } = req.decoded;
-    let user = await User.findOne({ userId: id });
-    await user.save();
-    const userInfo = {
-      id: user.id,
-      email: user.email,
-      firstName: user.firstName,
-      surname: user.surname,
-    };
+    let user = await User.findOne();
+
+    console.log(user.email);
+
     return res.send({ success: true, message: "User Logged out" });
   } catch (error) {
-    console.error("user-logout-error", error);
-    return res.stat(500).json({
+    console.error("getuserinfor", error);
+    return res.status(500).json({
       error: true,
       message: error.message,
     });
