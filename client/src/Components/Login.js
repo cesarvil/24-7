@@ -1,13 +1,14 @@
 import styled from "styled-components";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import ActivateAccount from "./ActivateAccount";
+import { CurrentUserContext } from "./CurrentUserContext";
 
-let bToken; // fix this. bearer token
 const Login = () => {
   const [userInfo, setUserInfo] = useState([]);
   const [loginSuccess, setLoginSuccess] = useState("");
   const [loginError, setLoginError] = useState("");
   const activationError = "You must verify your email to activate your account";
+  let { bToken } = useContext(CurrentUserContext);
 
   const handleSubmit = (ev) => {
     //handle loggin
@@ -30,8 +31,8 @@ const Login = () => {
         } else {
           setLoginSuccess(data.message);
           setLoginError("");
-          bToken = data.accessToken;
-          console.log(bToken);
+          console.log(bToken());
+          localStorage.setItem("btkn", data.accessToken);
         }
       })
       .catch((err) => setLoginError(err.message));
@@ -45,7 +46,7 @@ const Login = () => {
     fetch("/api/user-info", {
       method: "GET",
       headers: {
-        authorization: `bearer ${bToken}`,
+        authorization: `bearer ${bToken()}`,
         "Content-Type": "application/json",
         Accept: "application/json",
       },
@@ -101,6 +102,7 @@ const Login = () => {
           </form>
           {loginError && (
             <div>
+              <button onClick={(ev) => testJWT(ev)}>TEST</button>
               <Message>{loginError}</Message>
               {loginError === activationError && (
                 <ActivateAccount email={userInfo.email} />
