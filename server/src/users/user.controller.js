@@ -58,12 +58,14 @@ const userSchema = Joi.object().keys({
       });
       return errors;
     }),
+  schedule: Joi.object(),
 });
 
 const Signup = async (req, res) => {
   try {
     await mongoose.connect(process.env.MONGO_URI, options);
     //validation
+    console.log(req.body);
     const result = userSchema.validate(req.body);
     if (result.error) {
       return res.json({

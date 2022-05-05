@@ -1,10 +1,35 @@
 import styled from "styled-components";
-import React, { useState } from "react";
+import { employeeColors } from "./GlobalStyles";
+import { useNavigate } from "react-router-dom";
+
+import Loading from "./Loading";
+
+import React, { useEffect, useState } from "react";
 
 const Signup = () => {
   const [userInfo, setUserInfo] = useState([]);
   const [registrationSuccess, setRegistrationSuccess] = useState("");
   const [registrationError, setRegistrationError] = useState("");
+  const [availableColors, setAvailableColors] = useState(null);
+  const [chosenColor, setChosenColor] = useState("#DDDDDD");
+  let navigate = useNavigate();
+
+  useEffect(() => {
+    const getAvailableColors = () => {
+      fetch("api/colors")
+        .then((res) => res.json())
+        .then((data) => {
+          setAvailableColors(
+            // filtering out colors taken by another user;
+            Object.keys(employeeColors).filter((color) => {
+              return !data.colorsUsed.includes(color);
+            })
+          );
+        })
+        .catch((err) => console.log(err));
+    };
+    getAvailableColors();
+  }, []);
 
   const handleSubmit = (ev) => {
     //handle signup
@@ -17,6 +42,12 @@ const Signup = () => {
         confirmPassword: userInfo["confirm-password"],
         firstName: userInfo["first-name"],
         surname: userInfo.surname,
+        schedule: {
+          scheduleId: "tesxt", //can't change
+          scheduleName: "tesxt", // can change
+          userColor: userInfo.userColor,
+          accessLevel: "admin",
+        },
       }),
       headers: {
         "Content-Type": "application/json",
@@ -30,6 +61,12 @@ const Signup = () => {
         } else {
           setRegistrationSuccess(data.message);
           setRegistrationError("");
+          setAvailableColors([
+            ...availableColors.filter((color) => color !== data.userColor),
+          ]);
+          setTimeout(() => {
+            navigate("/login");
+          }, 3000);
         }
       })
       .catch((err) => setRegistrationError(err.message));
@@ -43,11 +80,17 @@ const Signup = () => {
     setUserInfo((values) => ({ ...values, [name]: value }));
   };
 
+  const handlePickColor = (ev) => {
+    setChosenColor(ev.target.value);
+    userInfo.userColor = ev.target.value;
+  };
+
   return (
     <Wrapper>
       {registrationSuccess ? (
         <RegistrationMessage>
           <h1>{registrationSuccess}</h1>
+          <Loading />
         </RegistrationMessage>
       ) : (
         <form onSubmit={(ev) => handleSubmit(ev)}>
@@ -89,8 +132,31 @@ const Signup = () => {
               name={"confirm-password"}
               required
             />
+            {availableColors !== null &&
+              availableColors &&
+              availableColors.length > 0 && (
+                <Select
+                  chosenColor={chosenColor}
+                  defaultValue={"DEFAULT"}
+                  onChange={(ev) => handlePickColor(ev)}
+                  name={"user-color"}
+                  required
+                >
+                  <option value={"DEFAULT"} disabled>
+                    Pick a Color
+                  </option>
+                  {availableColors.map((color) => {
+                    return (
+                      <option key={`color-${color}`} value={color}>
+                        {color}
+                      </option>
+                    );
+                  })}
+                </Select>
+              )}
           </FormStyle>
           <input type="submit" value="Submit" />
+          <Sample chosenColor={chosenColor}>{userInfo["first-name"]}</Sample>
         </form>
       )}
       {registrationError && (
@@ -119,5 +185,22 @@ const FormStyle = styled.div`
 `;
 
 const RegistrationMessage = styled.div``;
+
+const Select = styled.select`
+  width: 100%;
+  height: 100%;
+  display: initial;
+  appearance: none;
+  padding: 5px;
+  background-color: ${(props) => props.chosenColor};
+  color: white;
+  border: none;
+  font-family: inherit;
+  outline: none;
+`;
+
+const Sample = styled.h2`
+  background-color: ${(props) => props.chosenColor};
+`;
 
 export default Signup;

@@ -192,16 +192,16 @@ const modifyShift = async (req, res) => {
         },
       }
     );
-    //testing, TODO
-    //   return res.status(200).json({
-    //     status: 200,
-    //     success: true,
-    //   });
-    // } catch (err) {
-    //   console.error(err);
-    //   console.log("Test");
+    testing, TODO;
+    return res.status(200).json({
+      status: 200,
+      success: true,
+    });
+  } catch (err) {
+    console.error(err);
+    console.log("Test");
 
-    //   return res.status(500).json({ status: 500, message: err.message });
+    return res.status(500).json({ status: 500, message: err.message });
   } finally {
     client.close();
   }
@@ -272,7 +272,6 @@ const getDay = async (req, res) => {
 };
 
 const addUser = async (req, res) => {
-  let lastDay_Id = await getLast_Id();
   const { username, userColor } = req.body;
   const client = new MongoClient(MONGO_URI, options);
 
@@ -318,19 +317,18 @@ const addUser = async (req, res) => {
 };
 
 const getUsedColors = async (req, res) => {
-  let lastDay_Id = await getLast_Id();
   const { username, userColor } = req.body;
   const client = new MongoClient(MONGO_URI, options);
 
   try {
     await client.connect();
     const db = client.db("24-7");
-
+    let colorsUsed = ["silver"];
     //returns an array of default colors already in use.
-    let colorsUsed = await db.collection("users").find().toArray();
-
-    colorsUsed = colorsUsed.map((user) => user.userColor);
-
+    let users = await db.collection("users").find().toArray();
+    if (users.length > 0) {
+      colorsUsed = users.map((user) => user.schedule.userColor); //add schedule search
+    }
     res.status(200).json({
       status: 200,
       success: true,

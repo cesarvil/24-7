@@ -42,9 +42,9 @@ express()
   .post("/api/new-user", addUser) // add new user
   .get("/api/colors", getUsedColors) // gets all days
 
-  .post("/api/signup", Signup) // add new user
-  .post("/api/login", Login) // add new user
-  .patch("/api/activation", Activate) // add new user
+  .post("/api/signup", Signup) // sign up user, color is selected here, admin as well
+  .post("/api/login", Login) // loggin user, validating session with JWT token, storing it in localstorage for persisting user session
+  .patch("/api/activation", Activate) // activate email acount with code
   .get("/api/user-info", validateToken, getUserInfo) //validate token is a middleware,
   .get("/api/logout", validateToken, Logout)
   .get("/api/new-schedule", createSchedule) // new Collection
