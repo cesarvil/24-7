@@ -2,6 +2,13 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require("bcryptjs");
 
+const scheduleInfoSchema = new Schema({
+  scheduleId: { type: String, required: true },
+  scheduleName: { type: String, required: true },
+  accessLevel: { type: String, required: true },
+  userColor: { type: String, required: true },
+});
+
 const userSchema = new Schema(
   {
     //joi validation at userSchema in user-controller.js
@@ -16,11 +23,8 @@ const userSchema = new Schema(
     accessToken: { type: String, default: null },
     firstName: { type: String, required: true },
     surname: { type: String, required: true },
-    // isAdmin: { type: Boolean, default: false },
+    schedule: scheduleInfoSchema,
   },
-
-  // "isAdmin" : true,
-  // "scheduleName": "redfern"
   {
     timestamps: {
       createdAt: "createdAt",

@@ -62,7 +62,7 @@ export default createGlobalStyle`
         content: none;
     }
     h1, h2, h3 {
-      color: var(--primary-color);
+      /* color: var(--primary-color); */
       font-family: var(--heading-font-family);
     }
     h2 {

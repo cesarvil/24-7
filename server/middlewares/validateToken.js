@@ -12,9 +12,8 @@ async function validateToken(req, res, next) {
       message: "Access token is missing",
     });
   const token = req.headers.authorization.split(" ")[1]; // Bearer <token>
-  const options = {
-    expiresIn: "1h",
-  };
+
+  console.log("validating");
   try {
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
@@ -31,7 +30,8 @@ async function validateToken(req, res, next) {
       };
       return res.status(403).json(result);
     }
-    result = jwt.verify(token, process.env.JWT_SECRET, options);
+    result = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(result);
     if (!user.userId === result.id) {
       result = {
         error: true,
