@@ -12,6 +12,8 @@ export const employeeColors = {
   silver: "#DDDDDD",
   red: "#FF4136",
   orange: "#FF851B",
+  white: "#ffffff",
+  black: "#000000",
 };
 
 export default createGlobalStyle`

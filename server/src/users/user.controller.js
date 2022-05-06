@@ -5,6 +5,7 @@ const { sendEmail } = require("./helpers/mailer");
 const { generateJwt } = require("./helpers/generateJwt");
 const User = require("./user.model");
 const mongoose = require("mongoose");
+const { createSchedule } = require("../../handlers");
 
 const options = {
   useNewUrlParser: true,
@@ -65,7 +66,6 @@ const Signup = async (req, res) => {
   try {
     await mongoose.connect(process.env.MONGO_URI, options);
     //validation
-    console.log(req.body);
     const result = userSchema.validate(req.body);
     if (result.error) {
       return res.json({
@@ -74,8 +74,24 @@ const Signup = async (req, res) => {
         message: result.error.message,
       });
     }
+
+    //Check if user picked a color
+    if (!result.value.schedule.userColor) {
+      return res.json({
+        error: true,
+        message: "Please pick a color",
+      });
+    }
+    //Check has a scheduleId
+    if (!result.value.schedule.scheduleId) {
+      return res.json({
+        error: true,
+        message: "Missing schedule Id",
+      });
+    }
+
     //Check if the email has been already registered.
-    var user = await User.findOne({
+    let user = await User.findOne({
       email: result.value.email,
     });
     if (user) {
@@ -84,6 +100,35 @@ const Signup = async (req, res) => {
         message: "Email is already in use",
       });
     }
+
+    //Check has a calendar exists when creating a new one
+    if (result.value.schedule.accessLevel === "admin") {
+      user = await User.findOne({
+        "schedule.scheduleId": result.value.schedule.scheduleId,
+      });
+      if (user) {
+        return res.json({
+          error: true,
+          message: "Schedule already exists",
+        });
+      }
+      //creating schedule as a collection of days
+      await createSchedule(req, res);
+    } else {
+      //checking if the schedule exists
+      user = await User.findOne({
+        "schedule.scheduleId": result.value.schedule.scheduleId,
+      });
+      console.log("findone");
+      console.log(user);
+      if (!user) {
+        return res.json({
+          error: true,
+          message: "The schedule you are trying to join does not exists",
+        });
+      }
+    }
+
     //hashing the password
     const hash = await User.hashPassword(result.value.password);
     const id = uuid(); //Generate unique id for the user.

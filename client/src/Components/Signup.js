@@ -1,38 +1,41 @@
 import styled from "styled-components";
-import { employeeColors } from "./GlobalStyles";
+
 import { useNavigate } from "react-router-dom";
 
 import Loading from "./Loading";
 
 import React, { useEffect, useState } from "react";
 
+import ColorList from "./ColorList";
+
 const Signup = () => {
   const [userInfo, setUserInfo] = useState([]);
   const [registrationSuccess, setRegistrationSuccess] = useState("");
   const [registrationError, setRegistrationError] = useState("");
-  const [availableColors, setAvailableColors] = useState(null);
+  // const [availableColors, setAvailableColors] = useState(null);
   const [chosenColor, setChosenColor] = useState("#DDDDDD");
   let navigate = useNavigate();
 
-  useEffect(() => {
-    const getAvailableColors = () => {
-      fetch("api/colors")
-        .then((res) => res.json())
-        .then((data) => {
-          setAvailableColors(
-            // filtering out colors taken by another user;
-            Object.keys(employeeColors).filter((color) => {
-              return !data.colorsUsed.includes(color);
-            })
-          );
-        })
-        .catch((err) => console.log(err));
-    };
-    getAvailableColors();
-  }, []);
+  // useEffect(() => {
+  //   const getAvailableColors = () => {
+  //     fetch("api/colors")
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         setAvailableColors(
+  //           // filtering out colors taken by another user;
+  //           Object.keys(employeeColors).filter((color) => {
+  //             return !data.colorsUsed.includes(color);
+  //           })
+  //         );
+  //       })
+  //       .catch((err) => console.log(err));
+  //   };
+  //   getAvailableColors();
+  // }, []);
 
   const handleSubmit = (ev) => {
     //handle signup
+    console.log(userInfo);
     setRegistrationSuccess(false);
     fetch("/api/signup", {
       method: "POST",
@@ -43,10 +46,10 @@ const Signup = () => {
         firstName: userInfo["first-name"],
         surname: userInfo.surname,
         schedule: {
-          scheduleId: "tesxt", //can't change
+          scheduleId: userInfo["schedule-id"],
           scheduleName: "tesxt", // can change
           userColor: userInfo.userColor,
-          accessLevel: "admin",
+          accessLevel: userInfo["access-level"],
         },
       }),
       headers: {
@@ -58,15 +61,17 @@ const Signup = () => {
       .then((data) => {
         if (data.error) {
           setRegistrationError(data.message);
+          setUserInfo({ ...userInfo, ["schedule-id"]: "", userColor: "" });
+          setChosenColor("#DDDDDD");
         } else {
           setRegistrationSuccess(data.message);
           setRegistrationError("");
-          setAvailableColors([
-            ...availableColors.filter((color) => color !== data.userColor),
-          ]);
+          // setAvailableColors([
+          //   ...availableColors.filter((color) => color !== data.userColor),
+          // ]);
           setTimeout(() => {
             navigate("/login");
-          }, 3000);
+          }, 6000);
         }
       })
       .catch((err) => setRegistrationError(err.message));
@@ -91,6 +96,7 @@ const Signup = () => {
         <RegistrationMessage>
           <h1>{registrationSuccess}</h1>
           <Loading />
+          <h1>You will be redirected to the login page</h1>
         </RegistrationMessage>
       ) : (
         <form onSubmit={(ev) => handleSubmit(ev)}>
@@ -132,10 +138,10 @@ const Signup = () => {
               name={"confirm-password"}
               required
             />
-            {availableColors !== null &&
+            {/* {availableColors !== null &&
               availableColors &&
               availableColors.length > 0 && (
-                <Select
+                <ColorList
                   chosenColor={chosenColor}
                   defaultValue={"DEFAULT"}
                   onChange={(ev) => handlePickColor(ev)}
@@ -152,10 +158,94 @@ const Signup = () => {
                       </option>
                     );
                   })}
-                </Select>
-              )}
+                </ColorList>
+              )} */}
+            <fieldset>
+              <legend>Join or create schedule?</legend>
+
+              <div>
+                <input
+                  onChange={(ev) => {
+                    setUserInfo({
+                      ...userInfo,
+                      ["schedule-id"]: "",
+                      ["userColor"]: "",
+                    });
+                    setChosenColor("silver");
+                    handleChange(ev);
+                  }}
+                  type={"radio"}
+                  id={"new-schedule"}
+                  name={"access-level"}
+                  value={"admin"}
+                  required
+                />
+                <label htmlFor={"new-schedule"}>New Schedule?</label>
+              </div>
+
+              <div>
+                <input
+                  onChange={(ev) => {
+                    setUserInfo({
+                      ...userInfo,
+                      ["schedule-id"]: "",
+                      ["userColor"]: "",
+                    });
+                    setChosenColor("silver");
+                    handleChange(ev);
+                  }}
+                  type={"radio"}
+                  id={"join-schedule"}
+                  name={"access-level"}
+                  value={"regular"}
+                />
+                <label htmlFor={"join-schedule"}>Join existing Schedule</label>
+              </div>
+            </fieldset>
+            {userInfo["access-level"] === "regular" && (
+              <>
+                <label>Enter the Id of schedule you want to join:</label>
+                <input
+                  onChange={(ev) => handleChange(ev)}
+                  placeholder={"Enter Id"}
+                  name={"schedule-id"}
+                  value={userInfo["schedule-id"]}
+                  required
+                />
+                {userInfo["schedule-id"] && (
+                  <ColorList
+                    handlePickColor={handlePickColor}
+                    chosenColor={chosenColor}
+                    scheduleId={userInfo["schedule-id"]}
+                  />
+                )}
+              </>
+            )}
+            {userInfo["access-level"] === "admin" && (
+              <>
+                <label>Click to generate your Schedule Id</label>
+                <input
+                  type={"button"}
+                  onClick={(ev) => {
+                    ev.target.value = new Date().valueOf();
+                    handleChange(ev);
+                  }}
+                  name={"schedule-id"}
+                  value={"Click to get your id"}
+                  required //stopping here, need to verify collection exist
+                />
+                <h3>{userInfo["schedule-id"]}</h3>
+                {userInfo["schedule-id"] && (
+                  <ColorList
+                    handlePickColor={handlePickColor}
+                    chosenColor={chosenColor}
+                    scheduleId={userInfo["schedule-id"]}
+                  />
+                )}
+              </>
+            )}
           </FormStyle>
-          <input type="submit" value="Submit" />
+          <input type={"submit"} value={"Submit"} />
           <Sample chosenColor={chosenColor}>{userInfo["first-name"]}</Sample>
         </form>
       )}
@@ -186,18 +276,18 @@ const FormStyle = styled.div`
 
 const RegistrationMessage = styled.div``;
 
-const Select = styled.select`
-  width: 100%;
-  height: 100%;
-  display: initial;
-  appearance: none;
-  padding: 5px;
-  background-color: ${(props) => props.chosenColor};
-  color: white;
-  border: none;
-  font-family: inherit;
-  outline: none;
-`;
+// const ColorList = styled.select`
+//   width: 100%;
+//   height: 100%;
+//   display: initial;
+//   appearance: none;
+//   padding: 5px;
+//   background-color: ${(props) => props.chosenColor};
+//   color: white;
+//   border: none;
+//   font-family: inherit;
+//   outline: none;
+// `;
 
 const Sample = styled.h2`
   background-color: ${(props) => props.chosenColor};

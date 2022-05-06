@@ -317,18 +317,25 @@ const addUser = async (req, res) => {
 };
 
 const getUsedColors = async (req, res) => {
-  const { username, userColor } = req.body;
   const client = new MongoClient(MONGO_URI, options);
-
+  const scheduleId = req.params.scheduleId;
   try {
     await client.connect();
     const db = client.db("24-7");
-    let colorsUsed = ["silver"];
+    let colorsUsed = [];
+    let reservedColors = ["silver", "orange", "red", "white", "black"];
     //returns an array of default colors already in use.
-    let users = await db.collection("users").find().toArray();
+    let users = await db
+      .collection("users")
+      .find(
+        { "schedule.scheduleId": scheduleId },
+        { projection: { schedule: { userColor: 1 }, _id: 0 } } // if more fields needed add them here or delete the line
+      )
+      .toArray();
     if (users.length > 0) {
-      colorsUsed = users.map((user) => user.schedule.userColor); //add schedule search
+      colorsUsed = users.map((user) => user.schedule.userColor);
     }
+    colorsUsed = colorsUsed.concat(reservedColors);
     res.status(200).json({
       status: 200,
       success: true,
@@ -345,26 +352,26 @@ const getUsedColors = async (req, res) => {
 
 const createSchedule = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
-  const newSchedule = req.body.schedule; // add it to listcollection and createcollection
+  const scheduleName = req.body.schedule.scheduleId;
+  const accessLevel = req.body.schedule.accessLevel;
   try {
     // const  user = await User.findOne({ userId: id });
     await client.connect();
     const db = client.db("24-7");
     //verify that the schedule name does not exist
-    let x = await db.listCollections({ name: "customers" }).toArray();
-    console.log(x.length);
+    let schedule = await db.listCollections({ name: scheduleName }).toArray();
 
-    if (x.length > 0) {
-      return res.status(400).json({
+    if (schedule.length > 0 && accessLevel === "admin") {
+      res.status(400).json({
         error: true,
-        message: "Collection alraedy exists",
+        message: "Failed to create.  Schedule already exists",
       });
     }
     //create new collection
-    await db.createCollection("customers");
-    res.send({ success: true, message: `Collection created` });
+    await db.createCollection(scheduleName);
+    res.status({ success: true, message: `Collection created` });
   } catch (error) {
-    console.error("user-logout-error", error);
+    console.error("create schedule", error);
     return res.status(500).json({
       error: true,
       message: error.message,
