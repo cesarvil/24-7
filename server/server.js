@@ -40,7 +40,7 @@ express()
   .post("/api/shift-name", modifyShiftName) // modify in a shift
 
   .post("/api/new-user", addUser) // add new user
-  .get("/api/colors", getUsedColors) // gets all days
+  .get("/api/colors/:scheduleId", getUsedColors) // gets all days
 
   .post("/api/signup", Signup) // sign up user, color is selected here, admin as well
   .post("/api/login", Login) // loggin user, validating session with JWT token, storing it in localstorage for persisting user session
