@@ -289,17 +289,54 @@ const Logout = async (req, res) => {
   }
 };
 
-const getUserInfo = async (req, res) => {
+const getCurrentUserInfo = async (req, res) => {
   try {
-    console.log("getuserinfo");
+    const token = req.headers.authorization.split(" ")[1];
+    console.log("getCurrentUserInfo");
     mongoose.connect(process.env.MONGO_URI, options);
-    let user = await User.findOne();
+    let user = await User.findOne({ accessToken: token });
 
-    console.log(user.email);
+    console.log(user);
 
-    return res.send({ success: true, message: "User Logged out" });
+    return res.send({ success: true, message: "User info", user: user });
   } catch (error) {
-    console.error("getuserinfor", error);
+    console.error("getCurrentUserInfor", error);
+    return res.status(500).json({
+      error: true,
+      message: error.message,
+    });
+  }
+};
+
+//get the users linked to a schedule by an id, only extracting properties required to for the schedule itself
+const usersInScheduleId = async (req, res) => {
+  const scheduleId = req.params.scheduleId;
+  console.log("USERS in schedule", scheduleId);
+  try {
+    mongoose.connect(process.env.MONGO_URI, options);
+    let users = await User.find({
+      "schedule.scheduleId": scheduleId,
+    });
+
+    let usersScheduleProperties = users.map((user) => {
+      let userProps = {
+        firstName: user.firstName,
+        surname: user.surname,
+        userColor: user.schedule.userColor,
+        scheduleId: scheduleId,
+        accessLevel: user.accessLevel,
+      };
+      return userProps;
+    });
+    console.log(usersScheduleProperties);
+
+    return res.send({
+      success: true,
+      message: "User info",
+      usersScheduleProperties: usersScheduleProperties,
+    });
+  } catch (error) {
+    console.error("getCurrentUserInfor", error);
     return res.status(500).json({
       error: true,
       message: error.message,
@@ -312,5 +349,6 @@ module.exports = {
   Login,
   Activate,
   Logout,
-  getUserInfo,
+  getCurrentUserInfo,
+  usersInScheduleId,
 };

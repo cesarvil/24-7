@@ -1,24 +1,48 @@
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { breakpoints } from "../GlobalStyles";
-// import logo from "./LOGO.png";
-import { FiHome } from "react-icons/fi";
 import { GrSchedule } from "react-icons/gr";
+import { CurrentUserContext } from "../CurrentUserContext";
 
 const Header = () => {
+  const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
+  const logout = () => {
+    //resetting current user, removing token from localstoarge
+    setCurrentUser();
+    localStorage.removeItem("btkn");
+  };
+
   return (
     <Wrapper>
-      <StyledLink to={"/schedule"}>
-        <GrSchedule size={"24px"} />
-      </StyledLink>
+      {currentUser ? (
+        <StyledLink to={"/schedule"}>
+          <GrSchedule size={"24px"} />
+        </StyledLink>
+      ) : (
+        <StyledLink to={"/login"}>
+          <GrSchedule size={"24px"} />
+        </StyledLink>
+      )}
       <StyledLink to={"/"}>
-        {/* <LOGO src={logo} /> */}
         <h2>24-7</h2>
       </StyledLink>
       <InnerWrapper>
-        <StyledLink to={"/signup"}>SIGNUP</StyledLink>
-        <StyledLink to={"/login"}>LOGIN</StyledLink>
+        {currentUser ? (
+          <>
+            <StyledLink to={"/profile"}>
+              {currentUser.firstName.toUpperCase()}
+            </StyledLink>
+            <StyledLink to={"/login"} onClick={() => logout()}>
+              LOGOUT
+            </StyledLink>
+          </>
+        ) : (
+          <>
+            <StyledLink to={"/signup"}>SIGNUP</StyledLink>
+            <StyledLink to={"/login"}>LOGIN</StyledLink>
+          </>
+        )}
       </InnerWrapper>
     </Wrapper>
   );
@@ -36,8 +60,6 @@ const Wrapper = styled.div`
 
   h2 {
     position: absolute;
-    /*the calculation below is to keep the h2 Hcentered
-    if the h2 content changes, change the px value below to half
     of the h2 element width*/
     left: calc(50% - 40px);
     top: 20px;
@@ -70,12 +92,6 @@ const InnerWrapper = styled.div`
 const StyledLink = styled(Link)`
   text-decoration: none;
   color: black;
-`;
-
-const LOGO = styled.img`
-  display: inline-block;
-  height: 50px;
-  width: 50px;
 `;
 
 export default Header;

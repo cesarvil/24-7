@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import Loading from "./Loading";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import ColorList from "./ColorList";
 
@@ -12,26 +12,8 @@ const Signup = () => {
   const [userInfo, setUserInfo] = useState([]);
   const [registrationSuccess, setRegistrationSuccess] = useState("");
   const [registrationError, setRegistrationError] = useState("");
-  // const [availableColors, setAvailableColors] = useState(null);
   const [chosenColor, setChosenColor] = useState("#DDDDDD");
   let navigate = useNavigate();
-
-  // useEffect(() => {
-  //   const getAvailableColors = () => {
-  //     fetch("api/colors")
-  //       .then((res) => res.json())
-  //       .then((data) => {
-  //         setAvailableColors(
-  //           // filtering out colors taken by another user;
-  //           Object.keys(employeeColors).filter((color) => {
-  //             return !data.colorsUsed.includes(color);
-  //           })
-  //         );
-  //       })
-  //       .catch((err) => console.log(err));
-  //   };
-  //   getAvailableColors();
-  // }, []);
 
   const handleSubmit = (ev) => {
     //handle signup
@@ -61,14 +43,11 @@ const Signup = () => {
       .then((data) => {
         if (data.error) {
           setRegistrationError(data.message);
-          setUserInfo({ ...userInfo, ["schedule-id"]: "", userColor: "" });
+          setUserInfo({ ...userInfo, "schedule-id": "", userColor: "" });
           setChosenColor("#DDDDDD");
         } else {
           setRegistrationSuccess(data.message);
           setRegistrationError("");
-          // setAvailableColors([
-          //   ...availableColors.filter((color) => color !== data.userColor),
-          // ]);
           setTimeout(() => {
             navigate("/login");
           }, 6000);
@@ -138,28 +117,6 @@ const Signup = () => {
               name={"confirm-password"}
               required
             />
-            {/* {availableColors !== null &&
-              availableColors &&
-              availableColors.length > 0 && (
-                <ColorList
-                  chosenColor={chosenColor}
-                  defaultValue={"DEFAULT"}
-                  onChange={(ev) => handlePickColor(ev)}
-                  name={"user-color"}
-                  required
-                >
-                  <option value={"DEFAULT"} disabled>
-                    Pick a Color
-                  </option>
-                  {availableColors.map((color) => {
-                    return (
-                      <option key={`color-${color}`} value={color}>
-                        {color}
-                      </option>
-                    );
-                  })}
-                </ColorList>
-              )} */}
             <fieldset>
               <legend>Join or create schedule?</legend>
 
@@ -168,8 +125,8 @@ const Signup = () => {
                   onChange={(ev) => {
                     setUserInfo({
                       ...userInfo,
-                      ["schedule-id"]: "",
-                      ["userColor"]: "",
+                      "schedule-id": "",
+                      userColor: "",
                     });
                     setChosenColor("silver");
                     handleChange(ev);
@@ -188,8 +145,8 @@ const Signup = () => {
                   onChange={(ev) => {
                     setUserInfo({
                       ...userInfo,
-                      ["schedule-id"]: "",
-                      ["userColor"]: "",
+                      "schedule-id": "",
+                      userColor: "",
                     });
                     setChosenColor("silver");
                     handleChange(ev);

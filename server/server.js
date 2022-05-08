@@ -9,17 +9,18 @@ const {
   Login,
   Activate,
   Logout,
-  getUserInfo,
+  getCurrentUserInfo,
+  usersInScheduleId,
 } = require("./src/users/user.controller"); //stopping here
+
 const { validateToken } = require("./middlewares/validateToken");
 
 const {
-  getAllDays,
+  getSchedule,
   addWeek,
   deleteAll,
   modifyShiftName,
   getDay,
-  addUser,
   getUsedColors,
   createSchedule,
 } = require("./handlers");
@@ -33,19 +34,20 @@ express()
   .use(express.urlencoded({ extended: false }))
   .use("/", express.static(__dirname + "/"))
 
-  .get("/api/days", getAllDays) // gets all days
-  .get("/api/day/:_id", getDay) // gets all days
+  .get("/api/schedule/:scheduleId", getSchedule) // gets all days
+  .get("/api/schedule/:scheduleId/:_id", getDay) // gets single day
   .post("/api/new-week", addWeek) // add a week
   .post("/api/schedule-deletion", deleteAll) // delete all documents in days collection
   .post("/api/shift-name", modifyShiftName) // modify in a shift
 
-  .post("/api/new-user", addUser) // add new user
   .get("/api/colors/:scheduleId", getUsedColors) // gets all days
 
   .post("/api/signup", Signup) // sign up user, color is selected here, admin as well
   .post("/api/login", Login) // loggin user, validating session with JWT token, storing it in localstorage for persisting user session
   .patch("/api/activation", Activate) // activate email acount with code
-  .get("/api/user-info", validateToken, getUserInfo) //validate token is a middleware,
+  .get("/api/users/:scheduleId", usersInScheduleId) // get all users belonging to 1 schedule
+  .get("/api/user-info", validateToken, getCurrentUserInfo) //validate token is a middleware,
+
   .get("/api/logout", validateToken, Logout)
   .get("/api/new-schedule", createSchedule) // new Collection
   .use((req, res) => res.status(404).type("txt").send("🤷‍♂️"))

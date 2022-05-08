@@ -3,13 +3,13 @@ import styled from "styled-components";
 
 import { employeeColors } from "../GlobalStyles";
 
-const Days = ({ _id }) => {
+const Days = ({ _id, scheduleId, scheduleUsers }) => {
   const [day, setDay] = useState(null);
 
   useEffect(() => {
     //fetching all days and putting them in state
     const getDay = () => {
-      fetch(`api/day/${_id}`)
+      fetch(`api/schedule/${scheduleId}/${_id}`)
         .then((res) => res.json())
         .then((data) => {
           console.log(data.data);
@@ -28,6 +28,7 @@ const Days = ({ _id }) => {
         _id: _id,
         shift: shift,
         shiftName: shiftName,
+        scheduleId: scheduleId,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -49,7 +50,7 @@ const Days = ({ _id }) => {
     <Wrapper>
       {day !== null && day && (
         <div>
-          {console.log(day)}
+          {/* {console.log(day)} */}
           <DayMonth>{day.date.dayMonth}</DayMonth>
           <Weekdays>{day.date.weekday}</Weekdays>
           <Shift bColor={employeeColors.blue}>
@@ -70,10 +71,12 @@ const Days = ({ _id }) => {
                 <option value={"DEFAULT"} disabled>
                   {day.shift1.name}
                 </option>
-                <option value={"user1"}>user1</option>
-                <option value={"user2"}>user2</option>
-                <option value={"user3"}>user3</option>
-                <option value={"user4"}>user4</option>
+                {scheduleUsers.map((user) => {
+                  console.log(user.firstName); //STOPPING HERE, WORK ON COLOR CHANGE
+                  return (
+                    <option value={user.firstName}>{user.firstName}</option>
+                  );
+                })}
               </Select>
             </Name>
             <Hours>{day.shift1.start}</Hours>
@@ -201,7 +204,7 @@ const Name = styled.div`
       display: initial;
       appearance: none;
       padding: 5px;
-      background-color: black;
+      background-color: "gray"
       color: white;
       border: none;
       font-family: inherit;
@@ -209,6 +212,9 @@ const Name = styled.div`
     }
   }
 `;
+// ${(props) => {
+//   props.userColor ? props.userColor : "gray";
+// }};
 
 const Select = styled.select`
   display: none;

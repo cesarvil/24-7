@@ -47,14 +47,14 @@ const addSubstractDays = (date, val = 0) => {
   return newDay;
 };
 
-const getLast_Id = async () => {
+const getLast_Id = async (scheduleId) => {
   const client = new MongoClient(MONGO_URI, options);
   await client.connect();
 
   const db = client.db("24-7");
 
   let last_Id = await db
-    .collection("days")
+    .collection(scheduleId)
     .find({})
     .sort({ _id: -1 }) // -1 reverses the sort order.
     .limit(1)
@@ -80,17 +80,19 @@ const getLast_Id = async () => {
   return last_Id[0]._id;
 };
 
-const getAllDays = async (req, res) => {
+const getSchedule = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
+  const scheduleId = req.params.scheduleId;
+  console.log(scheduleId);
 
   try {
     await client.connect();
     const db = client.db("24-7");
-    const data = await db.collection("days").find().toArray();
+    const data = await db.collection(scheduleId).find().toArray();
     if (data.length === 0) {
       return res.status(404).json({
         status: 404,
-        error: "No shifts in the database",
+        error: "getSchedule : No shifts in the database",
       });
     } else {
       res
@@ -106,11 +108,11 @@ const getAllDays = async (req, res) => {
 
 const deleteAll = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
-
+  const scheduleId = req.body.scheduleId;
   try {
     await client.connect();
     const db = client.db("24-7");
-    const data = await db.collection("days").deleteMany({});
+    const data = await db.collection(scheduleId).deleteMany({});
     if (!data.length === 0) {
       return res.status(404).json({
         status: 404,
@@ -129,32 +131,34 @@ const deleteAll = async (req, res) => {
 };
 
 const addWeek = async (req, res) => {
-  let lastDay_Id = await getLast_Id();
   const client = new MongoClient(MONGO_URI, options);
+  const scheduleId = req.body.scheduleId;
+  // using this unique id to get the date as well.
+  let lastDay_Id = await getLast_Id(scheduleId);
 
   try {
     await client.connect();
     const db = client.db("24-7");
     for (let i = 0; i < 7; i++) {
-      lastDay_Id = incrementId(lastDay_Id);
-      await db.collection("days").insertOne({
+      lastDay_Id = incrementId(lastDay_Id); //change collection name to dynamic
+      await db.collection(scheduleId).insertOne({
         _id: lastDay_Id,
         date: {
           weekday: format(idToDate(lastDay_Id), "EEEE"),
           dayMonth: format(idToDate(lastDay_Id), "MMM dd"),
         },
         shift1: {
-          name: "Placeholder",
+          name: "xxx",
           start: "12am",
           end: "8am",
         },
         shift2: {
-          name: "Placeholder",
+          name: "xxx",
           start: "8am",
           end: "4pm",
         },
         shift3: {
-          name: "Placeholder",
+          name: "xxx",
           start: "4pm",
           end: "12am",
         },
@@ -211,6 +215,7 @@ const modifyShiftName = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
   const _id = req.body._id;
   const shift = req.body.shift;
+  const scheduleId = req.body.scheduleId;
   const employeeName = req.body.name;
   let shiftName = req.body.shiftName;
   shiftName = `${shift}.${shiftName}`; // target the document shiftx.name
@@ -218,7 +223,7 @@ const modifyShiftName = async (req, res) => {
     await client.connect();
     const db = client.db("24-7");
 
-    const newName = await db.collection("days").updateOne(
+    await db.collection(scheduleId).updateOne(
       { _id: _id },
       {
         $set: {
@@ -244,22 +249,22 @@ const modifyShiftName = async (req, res) => {
 const getDay = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
   const _id = Number(req.params._id);
-  console.log(_id);
+  const scheduleId = req.params.scheduleId;
   try {
     await client.connect();
     const db = client.db("24-7");
     const data = await db
-      .collection("days")
+      .collection(scheduleId)
       .find({ _id: _id })
       .limit(1)
       .toArray();
     if (data.length === 0) {
       return res.status(404).json({
         status: 404,
-        error: "No shifts in the database",
+        error: "Getday: No shifts in the database",
       });
     } else {
-      console.log(data[0]);
+      //data is the day information
       res
         .status(200)
         .json({ status: 200, data, message: "All shifts are shown" });
@@ -271,50 +276,50 @@ const getDay = async (req, res) => {
   }
 };
 
-const addUser = async (req, res) => {
-  const { username, userColor } = req.body;
-  const client = new MongoClient(MONGO_URI, options);
+// const addUser = async (req, res) => {
+//   const { username, userColor } = req.body;
+//   const client = new MongoClient(MONGO_URI, options);
 
-  try {
-    await client.connect();
-    const db = client.db("24-7");
-    //getting last Id and next id
-    let last_Id = await db
-      .collection("users")
-      .find({})
-      .sort({ _id: -1 })
-      .limit(1)
-      .toArray();
+//   try {
+//     await client.connect();
+//     const db = client.db("24-7");
+//     //getting last Id and next id
+//     let last_Id = await db
+//       .collection("users")
+//       .find({})
+//       .sort({ _id: -1 })
+//       .limit(1)
+//       .toArray();
 
-    if (last_Id.length === 0) {
-      last_Id = 100;
-    } else {
-      last_Id = last_Id[0]._id;
-      console.log(last_Id);
-    }
+//     if (last_Id.length === 0) {
+//       last_Id = 100;
+//     } else {
+//       last_Id = last_Id[0]._id;
+//       console.log(last_Id);
+//     }
 
-    last_Id++;
-    /////////////////////
+//     last_Id++;
+//     /////////////////////
 
-    await db.collection("users").insertOne({
-      _id: last_Id,
-      username: username,
-      userColor: userColor,
-    });
+//     await db.collection("users").insertOne({
+//       _id: last_Id,
+//       username: username,
+//       userColor: userColor,
+//     });
 
-    res.status(200).json({
-      status: 200,
-      success: true,
-      userColor: userColor,
-    });
-  } catch (err) {
-    console.error(err);
+//     res.status(200).json({
+//       status: 200,
+//       success: true,
+//       userColor: userColor,
+//     });
+//   } catch (err) {
+//     console.error(err);
 
-    res.status(500).json({ status: 500, message: err.message });
-  } finally {
-    client.close();
-  }
-};
+//     res.status(500).json({ status: 500, message: err.message });
+//   } finally {
+//     client.close();
+//   }
+// };
 
 const getUsedColors = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
@@ -380,17 +385,16 @@ const createSchedule = async (req, res) => {
 };
 
 // dbFunction("24-7");
-getLast_Id();
+// getLast_Id();
 // modifyShift();
 
 //exports all the endpoints
 module.exports = {
-  getAllDays,
+  getSchedule,
   addWeek,
   deleteAll,
   modifyShiftName,
   getDay,
-  addUser,
   getUsedColors,
   createSchedule,
 };
