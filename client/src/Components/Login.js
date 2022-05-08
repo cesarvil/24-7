@@ -8,7 +8,7 @@ const Login = () => {
   const [loginSuccess, setLoginSuccess] = useState("");
   const [loginError, setLoginError] = useState("");
   const activationError = "You must verify your email to activate your account";
-  let { bToken } = useContext(CurrentUserContext);
+  const { getCurrentUserInfo } = useContext(CurrentUserContext);
 
   const handleSubmit = (ev) => {
     //handle loggin
@@ -31,33 +31,8 @@ const Login = () => {
         } else {
           setLoginSuccess(data.message);
           setLoginError("");
-          console.log(bToken());
           localStorage.setItem("btkn", data.accessToken);
-        }
-      })
-      .catch((err) => setLoginError(err.message));
-
-    ev.preventDefault();
-  };
-
-  const testJWT = (ev) => {
-    //handle loggin
-    console.log(bToken);
-    fetch("/api/user-info", {
-      method: "GET",
-      headers: {
-        authorization: `bearer ${bToken()}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          setLoginError(data.message);
-        } else {
-          setLoginSuccess(data.message);
-          setLoginError("");
+          getCurrentUserInfo(data.accessToken);
         }
       })
       .catch((err) => setLoginError(err.message));
@@ -78,7 +53,6 @@ const Login = () => {
       {loginSuccess ? (
         <Message>
           <h1>{loginSuccess}</h1>
-          <button onClick={(ev) => testJWT(ev)}>TEST</button>
         </Message>
       ) : (
         <div>
@@ -104,7 +78,6 @@ const Login = () => {
           </form>
           {loginError && (
             <div>
-              <button onClick={(ev) => testJWT(ev)}>TEST</button>
               <Message>{loginError}</Message>
               {loginError === activationError && (
                 <ActivateAccount email={userInfo.email} />

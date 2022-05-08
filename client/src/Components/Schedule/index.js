@@ -1,23 +1,24 @@
 import styled from "styled-components";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 
 import Day from "./Day";
-import { employeeColors } from "../GlobalStyles";
 
-//ask about post vs get
-// refresh on variable change
+import { useNavigate } from "react-router-dom";
+import { CurrentUserContext } from "../CurrentUserContext";
 
 const Schedule = () => {
   const [allDays, setAllDays] = useState(null);
   const [lastId, setLastId] = useState(null);
-  // const [newUser, setNewUser] = useState(null);
-  // const [availableColors, setAvailableColors] = useState(null);
-  // const [chosenColor, setChosenColor] = useState("#DDDDDD");
-
+  const [scheduleUsers, setScheduleUsers] = useState(null);
+  const { currentUser } = useContext(CurrentUserContext);
+  let navigate = useNavigate();
   useEffect(() => {
+    console.log("schedule effect");
     //fetching all days and putting them in state
-    const getAllDays = () => {
-      fetch("api/days")
+
+    const getSchedule = () => {
+      let scheduleId = currentUser.schedule.scheduleId;
+      fetch(`api/schedule/${scheduleId}`)
         .then((res) => res.json())
         .then((data) => {
           setAllDays(data.data);
@@ -25,22 +26,36 @@ const Schedule = () => {
         .catch((err) => console.log(err));
     };
 
-    getAllDays();
-  }, [lastId]);
+    const getUsersInSchedule = () => {
+      let scheduleId = currentUser.schedule.scheduleId;
+      fetch(`api/users/${scheduleId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data.usersScheduleProperties);
+          setScheduleUsers(data.usersScheduleProperties);
+        })
+        .catch((err) => console.log(err));
+    };
+
+    //preventing error on refresh when currentuser is fetching
+    if (currentUser) {
+      getSchedule();
+      getUsersInSchedule();
+    }
+  }, [lastId, currentUser]);
 
   const handleAddWeek = () => {
     //function to add more weeks when clicking the add week button
-    console.log("data");
+
     fetch("/api/new-week", {
       method: "POST",
-      body: JSON.stringify({}),
+      body: JSON.stringify({ scheduleId: currentUser.schedule.scheduleId }),
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
     })
       .then((res) => {
-        console.log(res); // delete later
         return res.json();
       })
       .then((data) => {
@@ -53,7 +68,7 @@ const Schedule = () => {
     //function to add more weeks when clicking the add week button
     fetch("/api/schedule-deletion", {
       method: "POST",
-      body: JSON.stringify({}),
+      body: JSON.stringify({ scheduleId: currentUser.schedule.scheduleId }),
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -69,33 +84,13 @@ const Schedule = () => {
       .catch((err) => console.log(err));
   };
 
-  const idToDate = (dateId) => {
-    // delete
-    const dateString = dateId.toString();
-    const year = +dateString.substring(0, 4);
-    const month = +dateString.substring(4, 6);
-    const day = +dateString.substring(6, 8);
-
-    const date = new Date(year, month - 1, day);
-    console.log(date);
-    nextDay(date);
-  };
-
-  const nextDay = (date) => {
-    // delete
-    let nextDay = new Date(date);
-    nextDay.setDate(date.getDate() + 1);
-    console.log(nextDay);
-  };
-
-  // idToDate(20220425);
-
   return (
     <Wrapper>
       <button onClick={() => handleAddWeek()}>Add Week</button>
       <button onClick={() => handleDeleteAll()}>Delete all</button>
       {allDays !== null &&
         allDays &&
+        currentUser &&
         allDays
           .filter((_, index) => index % 7 === 0) // amount of weeks. just using the index.
           .map((_, index) => {
@@ -105,7 +100,13 @@ const Schedule = () => {
                   //index times 7 to match the index in days.
                   allDays.slice(index * 7, index * 7 + 7).map((day) => {
                     return (
-                      <Day key={`Day-${day._id}`} day={day} _id={day._id} />
+                      <Day
+                        key={`Day-${day._id}`}
+                        day={day}
+                        _id={day._id}
+                        scheduleId={currentUser.schedule.scheduleId}
+                        scheduleUsers={scheduleUsers}
+                      />
                     );
                   })
                 }

@@ -9,6 +9,9 @@ const ColorList = ({ handlePickColor, chosenColor, scheduleId }) => {
       fetch(`api/colors/${scheduleId}`)
         .then((res) => res.json())
         .then((data) => {
+          if (data.error) {
+            console.log(data.error);
+          }
           setAvailableColors(
             // filtering out colors taken by another user;
             Object.keys(employeeColors).filter((color) => {
