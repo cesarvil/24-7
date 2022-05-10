@@ -362,7 +362,7 @@ const modifyEndOfShift = async (req, res) => {
         { _id: nextId },
         {
           $set: {
-            "shift1.start": endTime,
+            "shift1.start": endTime, // UPDATE!!! start time of prev SHIFT
           },
         }
       );
