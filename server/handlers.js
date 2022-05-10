@@ -159,16 +159,19 @@ const addWeek = async (req, res) => {
           name: "",
           start: 24,
           end: 8,
+          status: "ok",
         },
         shift2: {
           name: "",
           start: 8,
           end: 16,
+          status: "ok",
         },
         shift3: {
           name: "",
           start: 16,
           end: 24,
+          status: "ok",
         },
       });
     }
@@ -194,6 +197,7 @@ const modifyShiftName = async (req, res) => {
   const scheduleId = req.body.scheduleId;
   const employeeName = req.body.name;
   let shiftName = req.body.shiftName;
+  let shiftStatus = `${shift}.status`;
   shiftName = `${shift}.${shiftName}`; // target the document shiftx.name
   try {
     await client.connect();
@@ -204,6 +208,7 @@ const modifyShiftName = async (req, res) => {
       {
         $set: {
           [shiftName]: employeeName,
+          [shiftStatus]: "ok",
         },
       }
     );
@@ -211,6 +216,7 @@ const modifyShiftName = async (req, res) => {
       status: 200,
       success: true,
       employeeName: employeeName,
+      shiftStatus: "ok",
     });
   } catch (err) {
     console.error(err);
@@ -377,6 +383,43 @@ const modifyEndOfShift = async (req, res) => {
   }
 };
 
+const requestChangeOfShift = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  const _id = req.body._id;
+  const shift = req.body.shift;
+  const scheduleId = req.body.scheduleId;
+  const requestChange = req.body.requestChange; // new time for end of shift
+  let shiftName = req.body.shiftName;
+  shiftName = `${shift}.${shiftName}`; // target the document shiftx.name
+
+  try {
+    await client.connect();
+    const db = client.db("24-7");
+
+    await db.collection(scheduleId).updateOne(
+      { _id: _id },
+      {
+        $set: {
+          [shiftName]: requestChange,
+        },
+      }
+    );
+
+    res.status(200).json({
+      status: 200,
+      success: true,
+      requestChange: requestChange,
+    });
+  } catch (err) {
+    console.error(err);
+    console.log("Test");
+
+    return res.status(500).json({ status: 500, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
 //displays each day in the schedule.
 const getDay = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
@@ -481,4 +524,5 @@ module.exports = {
   getUsedColors,
   createSchedule,
   modifyStartOfShift,
+  requestChangeOfShift,
 };
