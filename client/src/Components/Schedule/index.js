@@ -105,6 +105,7 @@ const Schedule = () => {
                         day={day}
                         _id={day._id}
                         scheduleId={currentUser.schedule.scheduleId}
+                        accessLevel={currentUser.schedule.accessLevel}
                         scheduleUsers={scheduleUsers}
                       />
                     );

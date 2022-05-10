@@ -20,10 +20,18 @@ const dateToId = (date) => {
   return Number(date);
 };
 
-const incrementId = (id) => {
+const getNextId = (id) => {
   // increment id from an id following the calendar dates (months ending in 28 30 31)
   let newId = idToDate(id);
   newId = addSubstractDays(newId, 1);
+  newId = dateToId(newId);
+  return newId;
+};
+
+const getPreviousId = (id) => {
+  // increment id from an id following the calendar dates (months ending in 28 30 31)
+  let newId = idToDate(id);
+  newId = addSubstractDays(newId, -1);
   newId = dateToId(newId);
   return newId;
 };
@@ -140,7 +148,7 @@ const addWeek = async (req, res) => {
     await client.connect();
     const db = client.db("24-7");
     for (let i = 0; i < 7; i++) {
-      lastDay_Id = incrementId(lastDay_Id); //change collection name to dynamic
+      lastDay_Id = getNextId(lastDay_Id); //changing id while following date rules.
       await db.collection(scheduleId).insertOne({
         _id: lastDay_Id,
         date: {
@@ -148,19 +156,19 @@ const addWeek = async (req, res) => {
           dayMonth: format(idToDate(lastDay_Id), "MMM dd"),
         },
         shift1: {
-          name: "xxx",
-          start: "12am",
-          end: "8am",
+          name: "",
+          start: 24,
+          end: 8,
         },
         shift2: {
-          name: "xxx",
-          start: "8am",
-          end: "4pm",
+          name: "",
+          start: 8,
+          end: 16,
         },
         shift3: {
-          name: "xxx",
-          start: "4pm",
-          end: "12am",
+          name: "",
+          start: 16,
+          end: 24,
         },
       });
     }
@@ -174,38 +182,6 @@ const addWeek = async (req, res) => {
     console.error(err);
 
     res.status(500).json({ status: 500, message: err.message });
-  } finally {
-    client.close();
-  }
-};
-
-const modifyShift = async (req, res) => {
-  const client = new MongoClient(MONGO_URI, options);
-
-  try {
-    await client.connect();
-    const db = client.db("24-7");
-
-    await db.collection("days").updateOne(
-      { _id: 20220428 },
-      {
-        $set: {
-          "shift1.name": "Cesar",
-          "shift1.start": "10am",
-          "shift1.end": "10pm",
-        },
-      }
-    );
-    testing, TODO;
-    return res.status(200).json({
-      status: 200,
-      success: true,
-    });
-  } catch (err) {
-    console.error(err);
-    console.log("Test");
-
-    return res.status(500).json({ status: 500, message: err.message });
   } finally {
     client.close();
   }
@@ -246,6 +222,162 @@ const modifyShiftName = async (req, res) => {
   }
 };
 
+const modifyStartOfShift = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  const _id = req.body._id;
+  const shift = req.body.shift;
+  const scheduleId = req.body.scheduleId;
+  const startTime = req.body.time; // new time for end of shift
+  let shiftName = req.body.shiftName;
+  shiftName = `${shift}.${shiftName}`; // target the document shiftx.name
+
+  let previousId = getPreviousId(_id);
+
+  try {
+    await client.connect();
+    const db = client.db("24-7");
+    let currentDay = await db.collection(scheduleId).findOne({ _id: _id });
+
+    if (shift === "shift3") {
+      await db.collection(scheduleId).updateOne(
+        { _id: _id },
+        {
+          $set: {
+            "shift2.end": startTime,
+          },
+        }
+      );
+    } else if (shift === "shift2") {
+      await db.collection(scheduleId).updateOne(
+        { _id: _id },
+        {
+          $set: {
+            "shift1.end": startTime,
+          },
+        }
+      );
+    } else {
+      // if its the first day in the collection and shift1, will skip this.
+      let firstDocument = await db.collection(scheduleId).findOne({});
+      if (shift === "shift1" && firstDocument._id !== _id) {
+        if (
+          !(
+            startTime < currentDay.shift1.end &&
+            -startTime + currentDay.shift1.end < 15
+          )
+        ) {
+          return res.json({
+            error: true,
+            status: 400,
+            message: "Wrong times or shift > 14 hours",
+            //stopping here.
+          });
+        }
+        await db.collection(scheduleId).updateOne(
+          { _id: previousId },
+          {
+            $set: {
+              "shift3.end": startTime,
+            },
+          }
+        );
+      }
+    }
+
+    await db.collection(scheduleId).updateOne(
+      { _id: _id },
+      {
+        $set: {
+          [shiftName]: startTime,
+        },
+      }
+    );
+
+    res.status(200).json({
+      status: 200,
+      success: true,
+      startTime: startTime,
+    });
+  } catch (err) {
+    console.error(err);
+
+    return res.status(500).json({ status: 500, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
+const modifyEndOfShift = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  const _id = req.body._id;
+  const shift = req.body.shift;
+  const scheduleId = req.body.scheduleId;
+  const endTime = req.body.time; // new time for end of shift
+  let shiftName = req.body.shiftName;
+  shiftName = `${shift}.${shiftName}`; // target the document shiftx.name
+
+  let lastDay_Id = await getLast_Id(scheduleId);
+  let nextId = getNextId(_id);
+
+  try {
+    await client.connect();
+    const db = client.db("24-7");
+
+    await db.collection(scheduleId).updateOne(
+      { _id: _id },
+      {
+        $set: {
+          [shiftName]: endTime,
+        },
+      }
+    );
+
+    if (shift === "shift1") {
+      await db.collection(scheduleId).updateOne(
+        { _id: _id },
+        {
+          $set: {
+            "shift2.start": endTime,
+          },
+        }
+      );
+    } else if (shift === "shift2") {
+      await db.collection(scheduleId).updateOne(
+        { _id: _id },
+        {
+          $set: {
+            "shift3.start": endTime,
+          },
+        }
+      );
+    } else if (shift === "shift3" && lastDay_Id !== _id) {
+      // if its the last day in the collection and shift3, will skip this.
+      await db.collection(scheduleId).updateOne(
+        { _id: nextId },
+        {
+          $set: {
+            "shift1.start": endTime,
+          },
+        }
+      );
+    }
+
+    res.status(200).json({
+      status: 200,
+      success: true,
+      endTime: endTime,
+    });
+  } catch (err) {
+    console.error(err);
+    console.log("Test");
+
+    return res.status(500).json({ status: 500, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
+//displays each day in the schedule.
 const getDay = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
   const _id = Number(req.params._id);
@@ -253,12 +385,8 @@ const getDay = async (req, res) => {
   try {
     await client.connect();
     const db = client.db("24-7");
-    const data = await db
-      .collection(scheduleId)
-      .find({ _id: _id })
-      .limit(1)
-      .toArray();
-    if (data.length === 0) {
+    const data = await db.collection(scheduleId).findOne({ _id: _id });
+    if (data.length === null) {
       return res.status(404).json({
         status: 404,
         error: "Getday: No shifts in the database",
@@ -275,51 +403,6 @@ const getDay = async (req, res) => {
     client.close();
   }
 };
-
-// const addUser = async (req, res) => {
-//   const { username, userColor } = req.body;
-//   const client = new MongoClient(MONGO_URI, options);
-
-//   try {
-//     await client.connect();
-//     const db = client.db("24-7");
-//     //getting last Id and next id
-//     let last_Id = await db
-//       .collection("users")
-//       .find({})
-//       .sort({ _id: -1 })
-//       .limit(1)
-//       .toArray();
-
-//     if (last_Id.length === 0) {
-//       last_Id = 100;
-//     } else {
-//       last_Id = last_Id[0]._id;
-//       console.log(last_Id);
-//     }
-
-//     last_Id++;
-//     /////////////////////
-
-//     await db.collection("users").insertOne({
-//       _id: last_Id,
-//       username: username,
-//       userColor: userColor,
-//     });
-
-//     res.status(200).json({
-//       status: 200,
-//       success: true,
-//       userColor: userColor,
-//     });
-//   } catch (err) {
-//     console.error(err);
-
-//     res.status(500).json({ status: 500, message: err.message });
-//   } finally {
-//     client.close();
-//   }
-// };
 
 const getUsedColors = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
@@ -360,7 +443,6 @@ const createSchedule = async (req, res) => {
   const scheduleName = req.body.schedule.scheduleId;
   const accessLevel = req.body.schedule.accessLevel;
   try {
-    // const  user = await User.findOne({ userId: id });
     await client.connect();
     const db = client.db("24-7");
     //verify that the schedule name does not exist
@@ -394,7 +476,9 @@ module.exports = {
   addWeek,
   deleteAll,
   modifyShiftName,
+  modifyEndOfShift,
   getDay,
   getUsedColors,
   createSchedule,
+  modifyStartOfShift,
 };

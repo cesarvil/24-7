@@ -29,7 +29,7 @@ const Signup = () => {
         surname: userInfo.surname,
         schedule: {
           scheduleId: userInfo["schedule-id"],
-          scheduleName: "tesxt", // can change
+          scheduleName: userInfo["schedule-id"], // can change
           userColor: userInfo.userColor,
           accessLevel: userInfo["access-level"],
         },

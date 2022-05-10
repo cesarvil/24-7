@@ -23,6 +23,8 @@ const {
   getDay,
   getUsedColors,
   createSchedule,
+  modifyEndOfShift,
+  modifyStartOfShift,
 } = require("./handlers");
 
 const PORT = process.env.PORT || 8000;
@@ -39,6 +41,8 @@ express()
   .post("/api/new-week", addWeek) // add a week
   .post("/api/schedule-deletion", deleteAll) // delete all documents in days collection
   .post("/api/shift-name", modifyShiftName) // modify in a shift
+  .post("/api/shift-end", modifyEndOfShift)
+  .post("/api/shift-start", modifyStartOfShift)
 
   .get("/api/colors/:scheduleId", getUsedColors) // gets all days
 
