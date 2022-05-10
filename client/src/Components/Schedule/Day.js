@@ -195,7 +195,7 @@ const Days = ({
             ) : accessLevel === "regular" &&
               day.shift1.name === currentUserName ? ( //request to be replaced
               <Name>
-                <span>{day.shift1.name}xxx</span>
+                <span>{day.shift1.name}</span>
                 <Select
                   firstName={day.shift1.name}
                   status={day.shift1.status}
@@ -219,6 +219,31 @@ const Days = ({
                   ) : (
                     <option value={"ok"}>Cancel request?</option>
                   )}
+                </Select>
+              </Name>
+            ) : accessLevel === "regular" &&
+              day.shift1.name !== currentUserName &&
+              day.shift1.status === "change" ? ( //Accept someones else request
+              <Name>
+                <span>{day.shift1.name}</span>
+                <Select
+                  firstName={day.shift1.name}
+                  scheduleUsers={scheduleUsers}
+                  defaultValue={"DEFAULT"}
+                  onChange={(ev) =>
+                    handleShiftNameChange(
+                      ev.target.value,
+                      day._id,
+                      "shift1",
+                      "name"
+                    )
+                  }
+                  onBlur={(ev) => (ev.target.value = "DEFAULT")}
+                >
+                  <option value={"DEFAULT"} disabled>
+                    {day.shift1.name}
+                  </option>
+                  <option value={currentUserName}>Take this shift?</option>
                 </Select>
               </Name>
             ) : (
@@ -283,61 +308,303 @@ const Days = ({
               <Hours>{day.shift1.end}H</Hours>
             )}
           </Shift>
-          <Shift firstName={day.shift2.name} scheduleUsers={scheduleUsers}>
-            <Name>
-              <span>{day.shift2.name}</span>
-              <Select
-                defaultValue={"DEFAULT"}
-                onChange={(ev) =>
-                  handleShiftNameChange(
-                    ev.target.value,
-                    day._id,
-                    "shift2",
-                    "name"
-                  )
-                }
-                onBlur={(ev) => (ev.target.value = "DEFAULT")}
-              >
-                <option value={"DEFAULT"} disabled>
-                  {day.shift2.name}
-                </option>
-                {scheduleUsers.map((user) => {
-                  return (
-                    <option value={user.firstName}>{user.firstName}</option>
-                  );
-                })}
-              </Select>
-            </Name>
-            <Hours>{day.shift2.start}</Hours>
-            <Hours>{day.shift2.end}</Hours>
+          <Shift
+            firstName={day.shift2.name}
+            scheduleUsers={scheduleUsers}
+            status={day.shift2.status}
+          >
+            {/*Name selection*/}
+            {accessLevel === "admin" ? ( //if admin display the select elemenet
+              <Name>
+                <span>{day.shift2.name}</span>
+                <Select
+                  firstName={day.shift2.name}
+                  scheduleUsers={scheduleUsers}
+                  defaultValue={"DEFAULT"}
+                  onChange={(ev) =>
+                    handleShiftNameChange(
+                      ev.target.value,
+                      day._id,
+                      "shift2",
+                      "name"
+                    )
+                  }
+                  onBlur={(ev) => (ev.target.value = "DEFAULT")}
+                >
+                  <option value={"DEFAULT"} disabled>
+                    {day.shift2.name}
+                  </option>
+                  {scheduleUsers.map((user) => {
+                    return (
+                      <option value={user.firstName}>{user.firstName}</option>
+                    );
+                  })}
+                </Select>
+              </Name>
+            ) : accessLevel === "regular" &&
+              day.shift2.name === currentUserName ? ( //request to be replaced
+              <Name>
+                <span>{day.shift2.name}</span>
+                <Select
+                  firstName={day.shift2.name}
+                  status={day.shift2.status}
+                  scheduleUsers={scheduleUsers}
+                  defaultValue={"DEFAULT"}
+                  onChange={(ev) =>
+                    handleRequestShiftChange(
+                      ev.target.value,
+                      day._id,
+                      "shift2",
+                      "status"
+                    )
+                  }
+                  onBlur={(ev) => (ev.target.value = "DEFAULT")}
+                >
+                  <option value={"DEFAULT"} disabled>
+                    {day.shift2.name}
+                  </option>
+                  {day.shift2.status === "ok" ? (
+                    <option value={"change"}>Request shift Change?</option>
+                  ) : (
+                    <option value={"ok"}>Cancel request?</option>
+                  )}
+                </Select>
+              </Name>
+            ) : accessLevel === "regular" &&
+              day.shift2.name !== currentUserName &&
+              day.shift2.status === "change" ? ( //Accept someones else request
+              <Name>
+                <span>{day.shift2.name}</span>
+                <Select
+                  firstName={day.shift2.name}
+                  scheduleUsers={scheduleUsers}
+                  defaultValue={"DEFAULT"}
+                  onChange={(ev) =>
+                    handleShiftNameChange(
+                      ev.target.value,
+                      day._id,
+                      "shift2",
+                      "name"
+                    )
+                  }
+                  onBlur={(ev) => (ev.target.value = "DEFAULT")}
+                >
+                  <option value={"DEFAULT"} disabled>
+                    {day.shift2.name}
+                  </option>
+                  <option value={currentUserName}>Take this shift?</option>
+                </Select>
+              </Name>
+            ) : (
+              <Name>{day.shift2.name}</Name>
+            )}
+            {/*Start of shift selection*/}
+            {accessLevel === "admin" ? ( //if admin display the select elemenet
+              <Hours>
+                <span>{day.shift2.start}H</span>
+                <Select
+                  firstName={day.shift2.name}
+                  scheduleUsers={scheduleUsers}
+                  defaultValue={"DEFAULT"}
+                  onChange={(ev) =>
+                    handleUpdateStartTime(
+                      ev.target.value,
+                      day._id,
+                      "shift2",
+                      "start"
+                    )
+                  }
+                  onBlur={(ev) => (ev.target.value = "DEFAULT")}
+                >
+                  <option value={"DEFAULT"} disabled>
+                    {day.shift2.start}H
+                  </option>
+                  {hours.map((hour) => {
+                    return <option value={hour}>{hour}H</option>;
+                  })}
+                </Select>
+              </Hours>
+            ) : (
+              <Hours>{day.shift2.start}H</Hours>
+            )}
+            {/*End of shift selection*/}
+            {accessLevel === "admin" ? ( //if admin display the select elemenet
+              <Hours>
+                <span>{day.shift2.end}H</span>
+                <Select
+                  firstName={day.shift2.name}
+                  scheduleUsers={scheduleUsers}
+                  defaultValue={"DEFAULT"}
+                  onChange={(ev) =>
+                    handleUpdateEndTime(
+                      ev.target.value,
+                      day._id,
+                      "shift2",
+                      "end"
+                    )
+                  }
+                  onBlur={(ev) => (ev.target.value = "DEFAULT")}
+                >
+                  <option value={"DEFAULT"} disabled>
+                    {day.shift2.end}H
+                  </option>
+                  {hours.map((hour) => {
+                    return <option value={hour}>{hour}H</option>;
+                  })}
+                </Select>
+              </Hours>
+            ) : (
+              <Hours>{day.shift2.end}H</Hours>
+            )}
           </Shift>
-          <Shift firstName={day.shift3.name} scheduleUsers={scheduleUsers}>
-            <Name>
-              <span>{day.shift3.name}</span>
-              <Select
-                defaultValue={"DEFAULT"}
-                onChange={(ev) =>
-                  handleShiftNameChange(
-                    ev.target.value,
-                    day._id,
-                    "shift3",
-                    "name"
-                  )
-                }
-                onBlur={(ev) => (ev.target.value = "DEFAULT")}
-              >
-                <option value={"DEFAULT"} disabled>
-                  {day.shift3.name}
-                </option>
-                {scheduleUsers.map((user) => {
-                  return (
-                    <option value={user.firstName}>{user.firstName}</option>
-                  );
-                })}
-              </Select>
-            </Name>
-            <Hours>{day.shift3.start}</Hours>
-            <Hours>{day.shift3.end}</Hours>
+          <Shift
+            firstName={day.shift3.name}
+            scheduleUsers={scheduleUsers}
+            status={day.shift3.status}
+          >
+            {/*Name selection*/}
+            {accessLevel === "admin" ? ( //if admin display the select elemenet
+              <Name>
+                <span>{day.shift3.name}</span>
+                <Select
+                  firstName={day.shift3.name}
+                  scheduleUsers={scheduleUsers}
+                  defaultValue={"DEFAULT"}
+                  onChange={(ev) =>
+                    handleShiftNameChange(
+                      ev.target.value,
+                      day._id,
+                      "shift3",
+                      "name"
+                    )
+                  }
+                  onBlur={(ev) => (ev.target.value = "DEFAULT")}
+                >
+                  <option value={"DEFAULT"} disabled>
+                    {day.shift3.name}
+                  </option>
+                  {scheduleUsers.map((user) => {
+                    return (
+                      <option value={user.firstName}>{user.firstName}</option>
+                    );
+                  })}
+                </Select>
+              </Name>
+            ) : accessLevel === "regular" &&
+              day.shift3.name === currentUserName ? ( //request to be replaced
+              <Name>
+                <span>{day.shift3.name}</span>
+                <Select
+                  firstName={day.shift3.name}
+                  status={day.shift3.status}
+                  scheduleUsers={scheduleUsers}
+                  defaultValue={"DEFAULT"}
+                  onChange={(ev) =>
+                    handleRequestShiftChange(
+                      ev.target.value,
+                      day._id,
+                      "shift3",
+                      "status"
+                    )
+                  }
+                  onBlur={(ev) => (ev.target.value = "DEFAULT")}
+                >
+                  <option value={"DEFAULT"} disabled>
+                    {day.shift3.name}
+                  </option>
+                  {day.shift3.status === "ok" ? (
+                    <option value={"change"}>Request shift Change?</option>
+                  ) : (
+                    <option value={"ok"}>Cancel request?</option>
+                  )}
+                </Select>
+              </Name>
+            ) : accessLevel === "regular" &&
+              day.shift3.name !== currentUserName &&
+              day.shift3.status === "change" ? ( //Accept someones else request
+              <Name>
+                <span>{day.shift3.name}</span>
+                <Select
+                  firstName={day.shift3.name}
+                  scheduleUsers={scheduleUsers}
+                  defaultValue={"DEFAULT"}
+                  onChange={(ev) =>
+                    handleShiftNameChange(
+                      ev.target.value,
+                      day._id,
+                      "shift3",
+                      "name"
+                    )
+                  }
+                  onBlur={(ev) => (ev.target.value = "DEFAULT")}
+                >
+                  <option value={"DEFAULT"} disabled>
+                    {day.shift3.name}
+                  </option>
+                  <option value={currentUserName}>Take this shift?</option>
+                </Select>
+              </Name>
+            ) : (
+              <Name>{day.shift3.name}</Name>
+            )}
+            {/*Start of shift selection*/}
+            {accessLevel === "admin" ? ( //if admin display the select elemenet
+              <Hours>
+                <span>{day.shift3.start}H</span>
+                <Select
+                  firstName={day.shift3.name}
+                  scheduleUsers={scheduleUsers}
+                  defaultValue={"DEFAULT"}
+                  onChange={(ev) =>
+                    handleUpdateStartTime(
+                      ev.target.value,
+                      day._id,
+                      "shift3",
+                      "start"
+                    )
+                  }
+                  onBlur={(ev) => (ev.target.value = "DEFAULT")}
+                >
+                  <option value={"DEFAULT"} disabled>
+                    {day.shift3.start}H
+                  </option>
+                  {hours.map((hour) => {
+                    return <option value={hour}>{hour}H</option>;
+                  })}
+                </Select>
+              </Hours>
+            ) : (
+              <Hours>{day.shift3.start}H</Hours>
+            )}
+            {/*End of shift selection*/}
+            {accessLevel === "admin" ? ( //if admin display the select elemenet
+              <Hours>
+                <span>{day.shift3.end}H</span>
+                <Select
+                  firstName={day.shift3.name}
+                  scheduleUsers={scheduleUsers}
+                  defaultValue={"DEFAULT"}
+                  onChange={(ev) =>
+                    handleUpdateEndTime(
+                      ev.target.value,
+                      day._id,
+                      "shift3",
+                      "end"
+                    )
+                  }
+                  onBlur={(ev) => (ev.target.value = "DEFAULT")}
+                >
+                  <option value={"DEFAULT"} disabled>
+                    {day.shift3.end}H
+                  </option>
+                  {hours.map((hour) => {
+                    return <option value={hour}>{hour}H</option>;
+                  })}
+                </Select>
+              </Hours>
+            ) : (
+              <Hours>{day.shift3.end}H</Hours>
+            )}
           </Shift>
         </div>
       )}
