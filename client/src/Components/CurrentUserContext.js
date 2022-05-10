@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 
 export const CurrentUserContext = createContext(null);
-
+//calling state before fetch and after fetch
 const initialState = {};
 
 export const CurrentUserProvider = ({ children }) => {

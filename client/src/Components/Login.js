@@ -16,7 +16,7 @@ const Login = () => {
     fetch("/api/login", {
       method: "POST",
       body: JSON.stringify({
-        email: userInfo.email,
+        email: userInfo.email.toLowerCase(),
         password: userInfo.password,
       }),
       headers: {

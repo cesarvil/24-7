@@ -22,7 +22,7 @@ const Signup = () => {
     fetch("/api/signup", {
       method: "POST",
       body: JSON.stringify({
-        email: userInfo.email,
+        email: userInfo.email.toLowerCase(),
         password: userInfo.password,
         confirmPassword: userInfo["confirm-password"],
         firstName: userInfo["first-name"],

@@ -25,6 +25,7 @@ const {
   createSchedule,
   modifyEndOfShift,
   modifyStartOfShift,
+  requestChangeOfShift,
 } = require("./handlers");
 
 const PORT = process.env.PORT || 8000;
@@ -43,6 +44,7 @@ express()
   .post("/api/shift-name", modifyShiftName) // modify in a shift
   .post("/api/shift-end", modifyEndOfShift)
   .post("/api/shift-start", modifyStartOfShift)
+  .post("/api/shift-change", validateToken, requestChangeOfShift)
 
   .get("/api/colors/:scheduleId", getUsedColors) // gets all days
 

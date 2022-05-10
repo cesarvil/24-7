@@ -3,7 +3,14 @@ import styled from "styled-components";
 
 import { employeeColors } from "../GlobalStyles";
 
-const Days = ({ _id, scheduleId, accessLevel, scheduleUsers }) => {
+const Days = ({
+  _id,
+  scheduleId,
+  accessLevel,
+  currentUserName,
+  scheduleUsers,
+  bToken,
+}) => {
   const hours = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
     22, 23, 24,
@@ -44,7 +51,11 @@ const Days = ({ _id, scheduleId, accessLevel, scheduleUsers }) => {
       .then((data) => {
         setDay({
           ...day,
-          [shift]: { ...day[shift], [shiftName]: data.employeeName },
+          [shift]: {
+            ...day[shift],
+            [shiftName]: data.employeeName, //renaming
+            status: data.shiftStatus, //changing status to ok if shift is taken by someone else
+          },
         });
       })
       .catch((err) => console.log(err));
@@ -54,7 +65,7 @@ const Days = ({ _id, scheduleId, accessLevel, scheduleUsers }) => {
     fetch("/api/shift-end", {
       method: "POST",
       body: JSON.stringify({
-        time: Number(time),
+        time: Number(time), // select/options return string and need number so casting
         _id: _id,
         shift: shift,
         shiftName: shiftName,
@@ -107,13 +118,52 @@ const Days = ({ _id, scheduleId, accessLevel, scheduleUsers }) => {
       .catch((err) => console.log(err));
   };
 
+  const handleRequestShiftChange = (requestChange, _id, shift, shiftName) => {
+    // setDay({
+    //   ...day,
+    //   [shift]: { ...day[shift], [shiftName]: requestChange },
+    // });
+    fetch("/api/shift-change", {
+      method: "POST",
+      body: JSON.stringify({
+        requestChange: requestChange,
+        _id: _id,
+        shift: shift,
+        shiftName: shiftName,
+        scheduleId: scheduleId,
+      }),
+      headers: {
+        authorization: `bearer ${bToken}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        if (data.error) {
+          console.log(data.message);
+        }
+        setDay({
+          ...day,
+          [shift]: { ...day[shift], [shiftName]: data.requestChange },
+        });
+      })
+      .catch((err) => console.log(err));
+  };
+
   return (
     <Wrapper>
       {day !== null && day && (
         <div>
           <DayMonth>{day.date.dayMonth}</DayMonth>
           <Weekdays>{day.date.weekday}</Weekdays>
-          <Shift firstName={day.shift1.name} scheduleUsers={scheduleUsers}>
+          <Shift
+            firstName={day.shift1.name}
+            scheduleUsers={scheduleUsers}
+            status={day.shift1.status}
+          >
             {/*Name selection*/}
             {accessLevel === "admin" ? ( //if admin display the select elemenet
               <Name>
@@ -140,6 +190,35 @@ const Days = ({ _id, scheduleId, accessLevel, scheduleUsers }) => {
                       <option value={user.firstName}>{user.firstName}</option>
                     );
                   })}
+                </Select>
+              </Name>
+            ) : accessLevel === "regular" &&
+              day.shift1.name === currentUserName ? ( //request to be replaced
+              <Name>
+                <span>{day.shift1.name}xxx</span>
+                <Select
+                  firstName={day.shift1.name}
+                  status={day.shift1.status}
+                  scheduleUsers={scheduleUsers}
+                  defaultValue={"DEFAULT"}
+                  onChange={(ev) =>
+                    handleRequestShiftChange(
+                      ev.target.value,
+                      day._id,
+                      "shift1",
+                      "status"
+                    )
+                  }
+                  onBlur={(ev) => (ev.target.value = "DEFAULT")}
+                >
+                  <option value={"DEFAULT"} disabled>
+                    {day.shift1.name}
+                  </option>
+                  {day.shift1.status === "ok" ? (
+                    <option value={"change"}>Request shift Change?</option>
+                  ) : (
+                    <option value={"ok"}>Cancel request?</option>
+                  )}
                 </Select>
               </Name>
             ) : (
@@ -296,8 +375,8 @@ const Shift = styled.div`
   /* filtering the user that matches the selected name, then taking the first element of the array, then the usercolor, then taking the color from employeeColors */
   background: ${(props) =>
     props.scheduleUsers && props.firstName
-      ? props.firstName === "xxx"
-        ? "gray"
+      ? props.status === "change"
+        ? employeeColors.orange
         : employeeColors[
             props.scheduleUsers.filter(
               (user) => props.firstName === user.firstName

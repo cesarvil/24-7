@@ -75,7 +75,6 @@ const Schedule = () => {
       },
     })
       .then((res) => {
-        console.log(res); // delete later
         return res.json();
       })
       .then((data) => {
@@ -106,6 +105,8 @@ const Schedule = () => {
                         _id={day._id}
                         scheduleId={currentUser.schedule.scheduleId}
                         accessLevel={currentUser.schedule.accessLevel}
+                        currentUserName={currentUser.firstName}
+                        bToken={currentUser.accessToken}
                         scheduleUsers={scheduleUsers}
                       />
                     );
