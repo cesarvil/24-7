@@ -119,8 +119,6 @@ const Signup = async (req, res) => {
       user = await User.findOne({
         "schedule.scheduleId": result.value.schedule.scheduleId,
       });
-      console.log("findone");
-      console.log(user);
       if (!user) {
         return res.json({
           error: true,
