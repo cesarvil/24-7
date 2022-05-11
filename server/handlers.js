@@ -266,19 +266,18 @@ const modifyStartOfShift = async (req, res) => {
       // if its the first day in the collection and shift1, will skip this.
       let firstDocument = await db.collection(scheduleId).findOne({});
       if (shift === "shift1" && firstDocument._id !== _id) {
-        if (
-          !(
-            startTime < currentDay.shift1.end &&
-            -startTime + currentDay.shift1.end < 15
-          )
-        ) {
-          return res.json({
-            error: true,
-            status: 400,
-            message: "Wrong times or shift > 14 hours",
-            //stopping here.
-          });
-        }
+        // if (
+        //   !(
+        //     startTime < currentDay.shift1.end &&
+        //     -startTime + currentDay.shift1.end < 15
+        //   )
+        // ) {
+        //   return res.json({
+        //     error: true,
+        //     status: 400,
+        //     message: "Wrong times or shift > 14 hours",
+        //   });
+        // }
         await db.collection(scheduleId).updateOne(
           { _id: previousId },
           {
@@ -289,7 +288,7 @@ const modifyStartOfShift = async (req, res) => {
         );
       }
     }
-
+    //
     await db.collection(scheduleId).updateOne(
       { _id: _id },
       {
@@ -315,7 +314,7 @@ const modifyStartOfShift = async (req, res) => {
 
 const modifyEndOfShift = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
-  const _id = req.body._id;
+  let _id = req.body._id;
   const shift = req.body.shift;
   const scheduleId = req.body.scheduleId;
   const endTime = req.body.time; // new time for end of shift
@@ -337,41 +336,91 @@ const modifyEndOfShift = async (req, res) => {
         },
       }
     );
-
+    let selectionError = false;
+    let nextShiftStart = "";
+    let currentDay = await db.collection(scheduleId).findOne({ _id: _id });
+    let nextDay = await db.collection(scheduleId).findOne({ _id: nextId });
     if (shift === "shift1") {
-      await db.collection(scheduleId).updateOne(
-        { _id: _id },
-        {
-          $set: {
-            "shift2.start": endTime,
-          },
-        }
-      );
+      if (currentDay.shift1.start === 24 && endTime >= 14) {
+        selectionError = true;
+      } else if (
+        currentDay.shift2.end <= endTime ||
+        currentDay.shift1.start >= endTime ||
+        currentDay.shift2.end - endTime >= 14 ||
+        -currentDay.shift1.start + endTime >= 14
+      ) {
+        selectionError = true;
+      }
+
+      if (selectionError) {
+        return res.json({
+          error: true,
+          status: 400,
+          message:
+            "Invalid time selection. Minimun shift time is 1hour and max is 14hours",
+        });
+      }
+      nextShiftStart = "shift2.start";
     } else if (shift === "shift2") {
-      await db.collection(scheduleId).updateOne(
-        { _id: _id },
-        {
-          $set: {
-            "shift3.start": endTime,
-          },
-        }
-      );
+      if (
+        //STOPPING HERE, HERE HAVE TO CHECK IF END3 IS BIGGER SMALLER THAN START3 AS WELLL
+        currentDay.shift3.end <= endTime ||
+        currentDay.shift2.start >= endTime ||
+        currentDay.shift3.end - endTime >= 14 ||
+        -currentDay.shift2.start + endTime >= 14
+      ) {
+        selectionError = true;
+      }
+
+      if (selectionError) {
+        return res.json({
+          error: true,
+          status: 400,
+          message:
+            "Invalid time selection. Minimun shift time is 1hour and max is 14hours",
+        });
+      }
+
+      nextShiftStart = "shift3.start";
     } else if (shift === "shift3" && lastDay_Id !== _id) {
       // if its the last day in the collection and shift3, will skip this.
+      //by preventing it to go to over the lastid, i dont have to worry at the front end that the allDays array will go out of bound
+
+      if (
+        (nextDay.shift1.end <= endTime && endTime !== 24) ||
+        (currentDay.shift3.start <= endTime && endTime !== 24) ||
+        nextDay.shift1.end - endTime > 14 ||
+        currentDay.shift3.start + endTime > 14
+      ) {
+        return res.json({
+          error: true,
+          status: 400,
+          message:
+            "Invalid time selection. Minimun shift time is 1hour and max is 14hours",
+        });
+      }
+
+      nextShiftStart = "shift1.start";
+      _id = nextId;
+    }
+
+    if (nextShiftStart !== "") {
       await db.collection(scheduleId).updateOne(
-        { _id: nextId },
+        { _id: _id },
         {
           $set: {
-            "shift1.start": endTime, // UPDATE!!! start time of prev SHIFT
+            [nextShiftStart]: endTime,
           },
         }
       );
+      nextShiftStart;
     }
 
     res.status(200).json({
       status: 200,
       success: true,
       endTime: endTime,
+      nextShiftStart: nextShiftStart,
     });
   } catch (err) {
     console.error(err);
