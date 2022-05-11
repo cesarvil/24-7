@@ -93,21 +93,27 @@ const Schedule = () => {
         allDays
           .filter((_, index) => index % 7 === 0) // amount of weeks. just using the index.
           .map((_, index) => {
+            let weekIndex = index * 7;
+            let dayIndex = weekIndex - 1;
             return (
               <Week key={`Week-${index + 1}`}>
                 {
                   //index times 7 to match the index in days.
-                  allDays.slice(index * 7, index * 7 + 7).map((day) => {
+                  allDays.slice(weekIndex, weekIndex + 7).map((day) => {
+                    dayIndex++;
                     return (
                       <Day
                         key={`Day-${day._id}`}
-                        day={day}
+                        dayx={day}
                         _id={day._id}
                         scheduleId={currentUser.schedule.scheduleId}
                         accessLevel={currentUser.schedule.accessLevel}
                         currentUserName={currentUser.firstName}
                         bToken={currentUser.accessToken}
                         scheduleUsers={scheduleUsers}
+                        allDays={allDays}
+                        setAllDays={setAllDays}
+                        dayIndex={dayIndex}
                       />
                     );
                   })
