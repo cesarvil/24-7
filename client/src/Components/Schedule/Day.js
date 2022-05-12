@@ -96,32 +96,32 @@ const Days = ({
       .then((data) => {
         // setDay({
         //   ...day,
-        //   [shift]: { ...day[shift], [shiftName]: data.endTime },
+        //   [shift]: { ...day[shift], [shiftName]: data.requestedTimeChange },
         // });
-        //updating endtime
+        //updating requestedTimeChange
         if (data.error) {
           console.log(data.message);
         } else {
           allDays[dayIndex][shift] = {
             ...allDays[dayIndex][shift],
-            [shiftName]: data.endTime,
+            [shiftName]: data.requestedTimeChange,
           };
           //updating start time of next shift
           let nextShiftStart = data.nextShiftStart.split(".")[0];
           if (nextShiftStart === "shift1") {
             allDays[dayIndex + 1].shift1 = {
               ...allDays[dayIndex + 1].shift1,
-              start: data.endTime,
+              start: data.requestedTimeChange,
             };
           } else if (nextShiftStart === "shift2") {
             allDays[dayIndex].shift2 = {
               ...allDays[dayIndex].shift2,
-              start: data.endTime,
+              start: data.requestedTimeChange,
             };
           } else if (nextShiftStart === "shift3") {
             allDays[dayIndex].shift3 = {
               ...allDays[dayIndex].shift3,
-              start: data.endTime,
+              start: data.requestedTimeChange,
             };
           }
           setAllDays([...allDays]);
