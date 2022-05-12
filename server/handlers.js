@@ -51,7 +51,6 @@ const addSubstractDays = (date, val = 0) => {
   //gets next day in date format from a date
   let newDay = new Date(date);
   newDay.setDate(newDay.getDate() + val); // val adds removes days
-  // console.log(format(newDay, "EEEE · MMM dd yyyy"));
   return newDay;
 };
 
@@ -82,9 +81,8 @@ const getLast_Id = async (scheduleId) => {
 
     //create new week from todays week TODO
     return last_Id;
-  } else {
   }
-  // console.log(last_Id);
+
   return last_Id[0]._id;
 };
 
@@ -259,7 +257,6 @@ const modifyShiftName = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    console.log("Test");
 
     return res.status(500).json({ status: 500, message: err.message });
   } finally {
@@ -269,10 +266,10 @@ const modifyShiftName = async (req, res) => {
 
 const modifyStartOfShift = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
-  const _id = req.body._id;
+  let _id = req.body._id;
   const shift = req.body.shift;
   const scheduleId = req.body.scheduleId;
-  const startTime = req.body.time; // new time for end of shift
+  const requestedTimeChange = req.body.time; // new time for end of shift
   let shiftName = req.body.shiftName;
   shiftName = `${shift}.${shiftName}`; // target the document shiftx.name
 
@@ -281,70 +278,129 @@ const modifyStartOfShift = async (req, res) => {
   try {
     await client.connect();
     const db = client.db("24-7");
+
+    let selectionErrorMessage = "";
+    let previousShiftEnd = "";
     let currentDay = await db.collection(scheduleId).findOne({ _id: _id });
     let previousDay = await db
       .collection(scheduleId)
       .findOne({ _id: previousId });
 
     if (shift === "shift3") {
-      await db.collection(scheduleId).updateOne(
-        { _id: _id },
-        {
-          $set: {
-            "shift2.end": startTime,
-          },
+      if (requestedTimeChange > currentDay.shift3.end) {
+        if (currentDay.shift3.end + 24 - requestedTimeChange > 14) {
+          //checking the current shift wont go over 14hours
+          selectionErrorMessage =
+            "xShift3: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
+        } else if (
+          requestedTimeChange <= currentDay.shift2.start ||
+          requestedTimeChange - currentDay.shift2.start > 14
+        ) {
+          selectionErrorMessage =
+            "Shift3: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
         }
-      );
+      } else if (
+        currentDay.shift3.end - requestedTimeChange > 14 &&
+        currentDay.shift3.end === 24
+      ) {
+        selectionErrorMessage = "Shift3:  Shift max amount is 14 hours";
+      }
+
+      previousShiftEnd = "shift2.end";
     } else if (shift === "shift2") {
-      await db.collection(scheduleId).updateOne(
-        { _id: _id },
-        {
-          $set: {
-            "shift1.end": startTime,
-          },
+      if (currentDay.shift1.start === 24) {
+        // not joining the && because i need to discard the 24 for the next checks
+        if (requestedTimeChange > 14) {
+          selectionErrorMessage =
+            "Shift2: Shifts can't be longer than 14 hours";
         }
-      );
+      } else if (
+        currentDay.shift1.start >= requestedTimeChange ||
+        -currentDay.shift1.start + requestedTimeChange > 14
+      ) {
+        selectionErrorMessage =
+          "Shift2: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
+      }
+
+      if (
+        currentDay.shift2.end <= requestedTimeChange ||
+        currentDay.shift2.end - requestedTimeChange > 14
+      ) {
+        selectionErrorMessage =
+          "Shift2: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
+      }
+
+      previousShiftEnd = "shift1.end";
     } else {
       // if its the first day in the collection and shift1, will skip this.
 
-      if (shift === "shift1" && previousDay !== null) {
-        console.log("not first"); //STOPPING HERE
-        // if (
-        //   !(
-        //     startTime < currentDay.shift1.end &&
-        //     -startTime + currentDay.shift1.end < 15
-        //   )
-        // ) {
-        //   return res.json({
-        //     error: true,
-        //     status: 400,
-        //     message: "Wrong times or shift > 14 hours",
-        //   });
-        // }
-        await db.collection(scheduleId).updateOne(
-          { _id: previousId },
-          {
-            $set: {
-              "shift3.end": startTime,
-            },
+      if (shift === "shift1") {
+        if (previousDay !== null) {
+          if (requestedTimeChange === 24 && previousDay.shift3.start < 10) {
+            selectionErrorMessage =
+              "Shift3: Shifts can't be longer than 14 hours";
+          } else if (
+            -previousDay.shift3.start + 24 + requestedTimeChange >
+            14
+          ) {
+            selectionErrorMessage =
+              "Shift2: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
           }
-        );
+          previousShiftEnd = "shift3.end";
+        }
+        if (requestedTimeChange === 24) {
+          if (currentDay.shift1.end > 14) {
+            selectionErrorMessage =
+              "Shift3: Shifts can't be longer than 14 hours";
+          }
+        } else if (
+          currentDay.shift1.end <= requestedTimeChange ||
+          currentDay.shift1.end - requestedTimeChange > 14
+        ) {
+          selectionErrorMessage =
+            "Shift2: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
+        }
       }
     }
     //
+    if (selectionErrorMessage !== "") {
+      return res.json({
+        error: true,
+        status: 400,
+        message: selectionErrorMessage,
+      });
+    }
+
     await db.collection(scheduleId).updateOne(
       { _id: _id },
       {
         $set: {
-          [shiftName]: startTime,
+          [shiftName]: requestedTimeChange,
         },
       }
     );
 
+    if (shift === "shift1") {
+      // to update the next day
+      _id = previousId;
+    }
+
+    if (previousShiftEnd !== "") {
+      await db.collection(scheduleId).updateOne(
+        { _id: _id },
+        {
+          $set: {
+            [previousShiftEnd]: requestedTimeChange,
+          },
+        }
+      );
+    }
+
     res.status(200).json({
       status: 200,
       success: true,
-      startTime: startTime,
+      requestedTimeChange: requestedTimeChange,
+      previousShiftEnd: previousShiftEnd,
     });
   } catch (err) {
     console.error(err);
@@ -379,15 +435,15 @@ const modifyEndOfShift = async (req, res) => {
     if (shift === "shift1") {
       if (currentDay.shift1.start === 24) {
         // not joining the && because i need to discard the 24 for the next checks
-        if (requestedTimeChange >= 14) {
+        if (requestedTimeChange > 14) {
           selectionErrorMessage =
             "Shift1: Shifts can't be longer than 14 hours";
         }
       } else if (
         currentDay.shift2.end <= requestedTimeChange ||
-        currentDay.shift2.end - requestedTimeChange >= 14 ||
+        currentDay.shift2.end - requestedTimeChange > 14 ||
         currentDay.shift1.start >= requestedTimeChange ||
-        -currentDay.shift1.start + requestedTimeChange >= 14
+        -currentDay.shift1.start + requestedTimeChange > 14
       ) {
         selectionErrorMessage =
           "Shift1: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
@@ -396,15 +452,15 @@ const modifyEndOfShift = async (req, res) => {
       nextShiftStart = "shift2.start";
     } else if (shift === "shift2") {
       if (currentDay.shift3.end < currentDay.shift3.start) {
-        if (currentDay.shift3.end + 24 - requestedTimeChange >= 14) {
+        if (currentDay.shift3.end + 24 - requestedTimeChange > 14) {
           selectionErrorMessage =
             "Shift2: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
         }
       } else if (
         currentDay.shift3.end <= requestedTimeChange ||
-        currentDay.shift3.end - requestedTimeChange >= 14 ||
+        currentDay.shift3.end - requestedTimeChange > 14 ||
         currentDay.shift2.start >= requestedTimeChange ||
-        -currentDay.shift2.start + requestedTimeChange >= 14
+        -currentDay.shift2.start + requestedTimeChange > 14
       ) {
         selectionErrorMessage =
           "Shift2: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
@@ -414,19 +470,19 @@ const modifyEndOfShift = async (req, res) => {
     } else if (shift === "shift3" && lastDay_Id !== _id) {
       if (requestedTimeChange < currentDay.shift3.start) {
         // when it goes overnight
-        if (-currentDay.shift3.start + 24 + requestedTimeChange >= 14) {
+        if (-currentDay.shift3.start + 24 + requestedTimeChange > 14) {
           //checking the current shift wont go over 14hours
           selectionErrorMessage =
             "Shift3: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
         } else if (
           requestedTimeChange >= nextDay.shift1.end ||
-          -requestedTimeChange + nextDay.shift1.end >= 14
+          -requestedTimeChange + nextDay.shift1.end > 14
         ) {
           selectionErrorMessage =
             "Shift3: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
         }
       } else if (
-        -currentDay.shift3.start + 24 + requestedTimeChange >= 14 ||
+        -currentDay.shift3.start + 24 + requestedTimeChange > 14 &&
         requestedTimeChange !== 24
       ) {
         selectionErrorMessage = "Shift3:  Shift must end at midnight or after";
@@ -434,7 +490,8 @@ const modifyEndOfShift = async (req, res) => {
 
       nextShiftStart = "shift1.start";
     } else if (
-      -currentDay.shift3.start + 24 + requestedTimeChange >= 14 &&
+      shift === "shift3" &&
+      -currentDay.shift3.start + 24 + requestedTimeChange > 14 &&
       requestedTimeChange !== 24
     ) {
       selectionErrorMessage =
@@ -472,7 +529,6 @@ const modifyEndOfShift = async (req, res) => {
           },
         }
       );
-      nextShiftStart;
     }
 
     res.status(200).json({
@@ -483,7 +539,6 @@ const modifyEndOfShift = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    console.log("Test");
 
     return res.status(500).json({ status: 500, message: err.message });
   } finally {
@@ -520,7 +575,6 @@ const requestChangeOfShift = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    console.log("Test");
 
     return res.status(500).json({ status: 500, message: err.message });
   } finally {

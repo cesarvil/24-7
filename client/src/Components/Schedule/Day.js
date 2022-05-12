@@ -16,8 +16,30 @@ const Days = ({
   dayIndex,
 }) => {
   const hours = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-    22, 23, 24,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
   ];
 
   const day = allDays[dayIndex];
@@ -149,18 +171,37 @@ const Days = ({
         return res.json();
       })
       .then((data) => {
-        if (data.error) {
-          console.log(data.message);
-        }
         // setDay({
         //   ...day,
-        //   [shift]: { ...day[shift], [shiftName]: data.startTime },
+        //   [shift]: { ...day[shift], [shiftName]: data.requestedTimeChange },
         // });
-        allDays[dayIndex][shift] = {
-          ...allDays[dayIndex][shift],
-          [shiftName]: data.startTime,
-        };
-        setAllDays([...allDays]);
+        if (data.error) {
+          console.log(data.message);
+        } else {
+          allDays[dayIndex][shift] = {
+            ...allDays[dayIndex][shift],
+            [shiftName]: data.requestedTimeChange,
+          };
+          //updating start time of next shift
+          let previousShiftEnd = data.previousShiftEnd.split(".")[0];
+          if (previousShiftEnd === "shift1") {
+            allDays[dayIndex].shift1 = {
+              ...allDays[dayIndex].shift1,
+              end: data.requestedTimeChange,
+            };
+          } else if (previousShiftEnd === "shift2") {
+            allDays[dayIndex].shift2 = {
+              ...allDays[dayIndex].shift2,
+              end: data.requestedTimeChange,
+            };
+          } else if (previousShiftEnd === "shift3") {
+            allDays[dayIndex - 1].shift3 = {
+              ...allDays[dayIndex - 1].shift3,
+              end: data.requestedTimeChange,
+            };
+          }
+          setAllDays([...allDays]);
+        }
       })
       .catch((err) => console.log(err));
   };
