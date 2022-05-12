@@ -238,7 +238,7 @@ const Activate = async (req, res) => {
       emailToken: activationCode,
       emailTokenExpires: { $gt: Date.now() }, // check if the code is expired (vs Date.now() + 60 * 1000 * 15)
     });
-    console.log(user);
+
     if (!user) {
       return res.status(400).json({
         error: true,
@@ -326,7 +326,6 @@ const usersInScheduleId = async (req, res) => {
       };
       return userProps;
     });
-    console.log(usersScheduleProperties);
 
     return res.send({
       success: true,
