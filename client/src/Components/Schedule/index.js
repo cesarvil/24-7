@@ -3,7 +3,6 @@ import React, { useEffect, useState, useContext } from "react";
 
 import Day from "./Day";
 
-import { useNavigate } from "react-router-dom";
 import { CurrentUserContext } from "../CurrentUserContext";
 
 const Schedule = () => {
@@ -11,17 +10,16 @@ const Schedule = () => {
   const [lastId, setLastId] = useState(null);
   const [scheduleUsers, setScheduleUsers] = useState(null);
   const { currentUser } = useContext(CurrentUserContext);
-  let navigate = useNavigate();
   useEffect(() => {
     console.log("schedule effect");
     //fetching all days and putting them in state
 
     const getSchedule = () => {
-      let scheduleId = currentUser.schedule.scheduleId;
+      const scheduleId = currentUser.schedule.scheduleId;
       fetch(`api/schedule/${scheduleId}`)
         .then((res) => res.json())
         .then((data) => {
-          setAllDays(data.data);
+          setAllDays(data.currentSchedule);
         })
         .catch((err) => console.log(err));
     };

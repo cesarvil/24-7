@@ -20,6 +20,8 @@ const dateToId = (date) => {
   return Number(date);
 };
 
+const checkIfPastDate = (date) => {};
+
 const getNextId = (id) => {
   // increment id from an id following the calendar dates (months ending in 28 30 31)
   let newId = idToDate(id);
@@ -50,7 +52,7 @@ const idToDate = (dateId) => {
 const addSubstractDays = (date, val = 0) => {
   //gets next day in date format from a date
   let newDay = new Date(date);
-  newDay.setDate(newDay.getDate() + val); // val adds removes days
+  newDay.setDate(newDay.getDate() + val); // val adds/removes days
   return newDay;
 };
 
@@ -94,16 +96,47 @@ const getSchedule = async (req, res) => {
   try {
     await client.connect();
     const db = client.db("24-7");
-    const data = await db.collection(scheduleId).find().toArray();
-    if (data.length === 0) {
+    const currentSchedule = await db.collection(scheduleId).find().toArray();
+    if (currentSchedule.length === 0) {
       return res.status(404).json({
         status: 404,
-        error: "getSchedule : No shifts in the database",
+        error: "getSchedule : No shifts in the currentSchedulebase",
       });
     } else {
-      res
-        .status(200)
-        .json({ status: 200, data, message: "All shifts are shown" });
+      let today = new Date(/*"May 22, 2022 00:00:00"*/);
+      let indexToStart = -14;
+      let date1 = currentSchedule[0]._id;
+      let date2 = null;
+      let pastSchedule = [];
+      date1 = idToDate(date1);
+
+      if (today >= date1) {
+        do {
+          // here we set the index of the current schedule.
+          indexToStart += 14;
+          date1 = currentSchedule[indexToStart]._id;
+          date1 = idToDate(date1);
+          date2 = addSubstractDays(
+            idToDate(currentSchedule[indexToStart]._id),
+            14
+          ); //condition, checking if today is bigger than the 2 stats of the week, if not, it means this is the current schedule
+        } while (today >= date1 && today >= date2);
+      } //backend for past schedule
+
+      if (indexToStart === -14) {
+        // if no current sechdule
+        currentSchedule = [];
+      } else {
+        pastSchedule = currentSchedule.slice(0, indexToStart); //setting past shifts
+        currentSchedule.splice(0, indexToStart); //setting current shifts
+      }
+
+      res.status(200).json({
+        status: 200,
+        currentSchedule,
+        pastSchedule,
+        message: "All shifts are shown",
+      });
     }
   } catch (err) {
     return res.status(500).json({ status: 500, message: err.message });
@@ -155,7 +188,7 @@ const addWeek = async (req, res) => {
       lastDayShift = lastDayShift.shift3.end;
     }
     /////
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 14; i++) {
       lastDay_Id = getNextId(lastDay_Id); //changing id while following date rules.
       if (i === 0 && lastDayShift !== null) {
         // if previous week exist, next week first shift is the same as of the last shift
@@ -609,13 +642,92 @@ const getDay = async (req, res) => {
   }
 };
 
+const calculateHours = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  const scheduleId = req.params.scheduleId;
+  const username = req.params.username;
+  try {
+    await client.connect();
+    const db = client.db("24-7");
+    let hoursPerDay = {
+      allTimes: 0,
+      thisTwoWeeks: 0,
+      thisMonth: 0,
+      lastMonth: 0,
+      thisYear: 0,
+      lastYear: 0,
+    };
+    //returns an array of default colors already in use.
+    let hours = await db
+      .collection(scheduleId)
+      .find(
+        {} /*
+        {
+          $or: [
+            { "shift1.name": "peter" },
+            { "shift2.name": "peter" },
+            { "shift3.name": "peter" },
+          ],
+        },
+        {
+          projection: {
+            shift3: { start: 1, end: 1 },
+            _id: 0,
+          },
+        }
+      */
+      )
+      .toArray();
+
+    if (hours.length > 0) {
+      hours.forEach((hour, index) => {
+        let total = 0;
+        if (hour.shift1.name === username) {
+          if (hour.shift1.start === 24) {
+            total = total - 24 + hour.shift1.end - hour.shift1.start;
+          } else {
+            total = total = total + hour.shift1.end - hour.shift1.start;
+          }
+        }
+
+        if (hour.shift2.name === username) {
+          total = hour.shift2.end - hour.shift2.start;
+        }
+
+        if (hour.shift3.name === username) {
+          if (hour.shift3.end < hour.shift3.start) {
+            total = total + 24 + hour.shift3.end - hour.shift3.start;
+          } else {
+            total = total = total + hour.shift3.end - hour.shift3.start;
+          }
+        }
+
+        hoursPerDay.allTimes += total;
+      });
+    }
+
+    console.log(hoursPerDay);
+    res.status(200).json({
+      status: 200,
+      success: true,
+      hoursPerDay: hoursPerDay,
+    });
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({ status: 500, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
 const getUsedColors = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
   const scheduleId = req.params.scheduleId;
   try {
     await client.connect();
     const db = client.db("24-7");
-    let colorsUsed = [];
+    let shifts = [];
     let reservedColors = ["silver", "orange", "red", "white", "black"];
     //returns an array of default colors already in use.
     let users = await db
@@ -687,4 +799,5 @@ module.exports = {
   createSchedule,
   modifyStartOfShift,
   requestChangeOfShift,
+  calculateHours,
 };
