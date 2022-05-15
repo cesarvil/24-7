@@ -7,18 +7,20 @@ import Profile from "./Profile";
 import Schedule from "./Schedule";
 import Signup from "./Signup";
 import Login from "./Login";
+import PastSchedule from "./Schedule/PastSchedules";
 
 function App() {
   return (
     <Router>
       <GlobalStyles />
-      <Header></Header>
+      <Header />
       <Wrapper>
         <Routes>
           <Route path="/" exact element={<Homepage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/schedule" element={<Schedule />} />
+          <Route path="/past-schedule" element={<PastSchedule />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
       </Wrapper>

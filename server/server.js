@@ -26,6 +26,7 @@ const {
   modifyEndOfShift,
   modifyStartOfShift,
   requestChangeOfShift,
+  calculateHours,
 } = require("./handlers");
 
 const PORT = process.env.PORT || 8000;
@@ -46,7 +47,8 @@ express()
   .post("/api/shift-start", modifyStartOfShift)
   .post("/api/shift-change", validateToken, requestChangeOfShift)
 
-  .get("/api/colors/:scheduleId", getUsedColors) // gets all days
+  .get("/api/colors/:scheduleId", getUsedColors) // gets colors used
+  .get("/api/hours/:scheduleId/:username", calculateHours) // gets hours worked used
 
   .post("/api/signup", Signup) // sign up user, color is selected here, admin as well
   .post("/api/login", Login) // loggin user, validating session with JWT token, storing it in localstorage for persisting user session
