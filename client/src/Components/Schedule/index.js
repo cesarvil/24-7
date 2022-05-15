@@ -83,8 +83,9 @@ const Schedule = () => {
 
   return (
     <Wrapper>
-      <button onClick={() => handleAddWeek()}>Add Week</button>
+      <button onClick={() => handleAddWeek()}>Add 2 Weeks</button>
       <button onClick={() => handleDeleteAll()}>Delete all</button>
+
       {allDays !== null &&
         allDays &&
         currentUser &&
@@ -112,6 +113,7 @@ const Schedule = () => {
                         allDays={allDays}
                         setAllDays={setAllDays}
                         dayIndex={dayIndex}
+                        past={false}
                       />
                     );
                   })

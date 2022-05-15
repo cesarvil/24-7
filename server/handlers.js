@@ -20,7 +20,45 @@ const dateToId = (date) => {
   return Number(date);
 };
 
-const checkIfPastDate = (date) => {};
+const checkIfPastDate = (allShifts) => {
+  //returns null if no shifts
+  //returns -1 if all shifts are in the future
+  //returns -2 if all shifts are in the past
+  //returns starting index of the current week.
+  if (allShifts.length === 0) {
+    return null;
+  }
+  let today = new Date("May 28, 2022 00:00:00"); /*"May 22, 2022 00:00:00"*/
+  let indexToStart = -14;
+  let date1 = allShifts[0]._id;
+  date2 = addSubstractDays(idToDate(allShifts[allShifts.length - 1]._id), 14);
+  let pastSchedule = [];
+  date1 = idToDate(date1);
+
+  if (today < date1 && today < date2) {
+    // today before than any shift
+    return -1;
+  } else if (today > date1 && today > date2) {
+    // today after than any shift
+    return -2;
+    pastSchedule = allShifts;
+    allShifts = [];
+  } else if (today >= date1 && today <= date2) {
+    //past and current schedule logic
+    do {
+      // here we set the index of the current schedule.
+      indexToStart += 14;
+
+      date1 = allShifts[indexToStart]._id;
+      date1 = idToDate(date1);
+      date2 = addSubstractDays(idToDate(allShifts[indexToStart]._id), 14); //condition, checking if today is bigger than the 2 stats of the week, if not, it means this is the current schedule
+    } while (today >= date1 && today >= date2);
+    //backend for past schedule
+
+    return indexToStart;
+  }
+  return "error";
+};
 
 const getNextId = (id) => {
   // increment id from an id following the calendar dates (months ending in 28 30 31)
@@ -96,39 +134,38 @@ const getSchedule = async (req, res) => {
   try {
     await client.connect();
     const db = client.db("24-7");
-    const currentSchedule = await db.collection(scheduleId).find().toArray();
+    let currentSchedule = await db.collection(scheduleId).find().toArray();
+
     if (currentSchedule.length === 0) {
       return res.status(404).json({
         status: 404,
         error: "getSchedule : No shifts in the currentSchedulebase",
       });
     } else {
-      let today = new Date(/*"May 22, 2022 00:00:00"*/);
-      let indexToStart = -14;
-      let date1 = currentSchedule[0]._id;
-      let date2 = null;
+      todayBiweekStartingIndex = checkIfPastDate(currentSchedule);
+      // let today = new Date("May 22, 2022 00:00:00"); /*"May 22, 2022 00:00:00"*/
+      // let indexToStart = -14;
+      // let date1 = currentSchedule[0]._id;
+      // date2 = addSubstractDays(
+      //   idToDate(currentSchedule[currentSchedule.length - 1]._id),
+      //   14
+      // );
       let pastSchedule = [];
-      date1 = idToDate(date1);
+      // date1 = idToDate(date1);
 
-      if (today >= date1) {
-        do {
-          // here we set the index of the current schedule.
-          indexToStart += 14;
-          date1 = currentSchedule[indexToStart]._id;
-          date1 = idToDate(date1);
-          date2 = addSubstractDays(
-            idToDate(currentSchedule[indexToStart]._id),
-            14
-          ); //condition, checking if today is bigger than the 2 stats of the week, if not, it means this is the current schedule
-        } while (today >= date1 && today >= date2);
-      } //backend for past schedule
-
-      if (indexToStart === -14) {
-        // if no current sechdule
+      if (todayBiweekStartingIndex === -1) {
+        // today before than any shift
+      } else if (todayBiweekStartingIndex === -2) {
+        // today after than any shift
+        pastSchedule = currentSchedule;
         currentSchedule = [];
-      } else {
-        pastSchedule = currentSchedule.slice(0, indexToStart); //setting past shifts
-        currentSchedule.splice(0, indexToStart); //setting current shifts
+      } else if (todayBiweekStartingIndex >= 0) {
+        //Schedule contains shifts before this biweek and after
+        console.log(todayBiweekStartingIndex);
+        //backend for past schedule
+
+        pastSchedule = currentSchedule.slice(0, todayBiweekStartingIndex); //setting past shifts
+        currentSchedule.splice(0, todayBiweekStartingIndex); //setting current shifts
       }
 
       res.status(200).json({
@@ -369,15 +406,17 @@ const modifyStartOfShift = async (req, res) => {
 
       if (shift === "shift1") {
         if (previousDay !== null) {
-          if (requestedTimeChange === 24 && previousDay.shift3.start < 10) {
-            selectionErrorMessage =
-              "Shift3: Shifts can't be longer than 14 hours";
+          if (requestedTimeChange === 24) {
+            if (previousDay.shift3.start < 10) {
+              selectionErrorMessage =
+                "Shift3: Shifts can't be longer than 14 hours";
+            }
           } else if (
             -previousDay.shift3.start + 24 + requestedTimeChange >
             14
           ) {
             selectionErrorMessage =
-              "Shift2: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
+              "Shift3: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
           }
           previousShiftEnd = "shift3.end";
         }
@@ -727,7 +766,7 @@ const getUsedColors = async (req, res) => {
   try {
     await client.connect();
     const db = client.db("24-7");
-    let shifts = [];
+    let colorsUsed = [];
     let reservedColors = ["silver", "orange", "red", "white", "black"];
     //returns an array of default colors already in use.
     let users = await db
@@ -740,6 +779,7 @@ const getUsedColors = async (req, res) => {
     if (users.length > 0) {
       colorsUsed = users.map((user) => user.schedule.userColor);
     }
+    console.log(users);
     colorsUsed = colorsUsed.concat(reservedColors);
     res.status(200).json({
       status: 200,

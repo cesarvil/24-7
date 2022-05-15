@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { breakpoints } from "../GlobalStyles";
-import { GrSchedule } from "react-icons/gr";
+import { GrSchedule, GrHistory } from "react-icons/gr";
 import { CurrentUserContext } from "../CurrentUserContext";
 
 const Header = () => {
@@ -16,13 +16,23 @@ const Header = () => {
   return (
     <Wrapper>
       {currentUser ? (
-        <StyledLink to={"/schedule"}>
-          <GrSchedule size={"24px"} />
-        </StyledLink>
+        <InnerWrapper>
+          <StyledLink to={"/schedule"}>
+            <GrSchedule size={"24px"} />
+          </StyledLink>
+          <StyledLink to={"/past-schedule"}>
+            <GrHistory size={"24px"} />
+          </StyledLink>
+        </InnerWrapper>
       ) : (
-        <StyledLink to={"/login"}>
-          <GrSchedule size={"24px"} />
-        </StyledLink>
+        <InnerWrapper>
+          <StyledLink to={"/login"}>
+            <GrSchedule size={"24px"} />
+          </StyledLink>
+          <StyledLink to={"/login"}>
+            <GrHistory size={"24px"} />
+          </StyledLink>
+        </InnerWrapper>
       )}
       <StyledLink to={"/"}>
         <h2>24-7</h2>
