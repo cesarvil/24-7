@@ -33,6 +33,8 @@ const Profile = () => {
       {hoursPerDay !== null && hoursPerDay && (
         <div>
           Hours in total :<h1>{hoursPerDay.allTimes}</h1>
+          Hours current 2 weeks :<h1>{hoursPerDay.thisTwoWeeks}</h1>
+          Hours past 2 weeks :<h1>{hoursPerDay.pastTwoWeeks}</h1>
         </div>
       )}
     </Wrapper>

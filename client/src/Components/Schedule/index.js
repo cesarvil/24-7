@@ -62,7 +62,7 @@ const Schedule = () => {
       .catch((err) => console.log(err));
   };
 
-  const handleDeleteAll = () => {
+  const handleDeleteLastTwoWeeks = () => {
     //function to add more weeks when clicking the add week button
     fetch("/api/schedule-deletion", {
       method: "POST",
@@ -81,11 +81,25 @@ const Schedule = () => {
       .catch((err) => console.log(err));
   };
 
+  const handleEmailSchedule = () => {
+    const scheduleId = currentUser.schedule.scheduleId;
+    // const email = currentUser.email;
+    const email = "cezarvillao@gmail.com";
+    fetch(`api/email/${scheduleId}/${email}`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => console.log(err));
+  };
+
   return (
     <Wrapper>
       <button onClick={() => handleAddWeek()}>Add 2 Weeks</button>
-      <button onClick={() => handleDeleteAll()}>Delete all</button>
-
+      <button onClick={() => handleDeleteLastTwoWeeks()}>
+        Remove last 2 weeks
+      </button>{" "}
+      <button onClick={() => handleEmailSchedule()}>Email Schedule</button>
       {allDays !== null &&
         allDays &&
         currentUser &&
