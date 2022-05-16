@@ -20,7 +20,7 @@ const dateToId = (date) => {
   return Number(date);
 };
 
-const checkIfPastDate = (allShifts) => {
+const getCurrentBiweekStartingIndex = (allShifts) => {
   //returns null if no shifts
   //returns -1 if all shifts are in the future
   //returns -2 if all shifts are in the past
@@ -28,7 +28,8 @@ const checkIfPastDate = (allShifts) => {
   if (allShifts.length === 0) {
     return null;
   }
-  let today = new Date("May 28, 2022 00:00:00"); /*"May 22, 2022 00:00:00"*/
+  //change today date for testing
+  let today = new Date(); /*"May 22, 2022 00:00:00"*/
   let indexToStart = -14;
   let date1 = allShifts[0]._id;
   date2 = addSubstractDays(idToDate(allShifts[allShifts.length - 1]._id), 14);
@@ -142,7 +143,9 @@ const getSchedule = async (req, res) => {
         error: "getSchedule : No shifts in the currentSchedulebase",
       });
     } else {
-      todayBiweekStartingIndex = checkIfPastDate(currentSchedule);
+      let todayBiweekStartingIndex = getCurrentBiweekStartingIndex(
+        currentSchedule
+      );
       // let today = new Date("May 22, 2022 00:00:00"); /*"May 22, 2022 00:00:00"*/
       // let indexToStart = -14;
       // let date1 = currentSchedule[0]._id;
@@ -185,19 +188,30 @@ const getSchedule = async (req, res) => {
 const deleteAll = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
   const scheduleId = req.body.scheduleId;
+  let lastDay_Id = await getLast_Id(scheduleId);
+
+  //substract 14 days to last id
+  lastDay_Id = dateToId(addSubstractDays(idToDate(lastDay_Id), -14));
+  console.log(lastDay_Id);
   try {
     await client.connect();
     const db = client.db("24-7");
-    const data = await db.collection(scheduleId).deleteMany({});
-    if (!data.length === 0) {
+    const data = await db
+      .collection(scheduleId)
+      .deleteMany({ _id: { $gt: lastDay_Id } });
+
+    if (data.deletedCount !== 14) {
       return res.status(404).json({
         status: 404,
-        error: "No shifts in the database",
+        error: "No shifts were deleted",
       });
     } else {
-      res
-        .status(200)
-        .json({ status: 200, data, message: "All shifts deleted" });
+      res.status(200).json({
+        status: 200,
+        data,
+        message: "All shifts deleted",
+        lastDay_Id: lastDay_Id,
+      });
     }
   } catch (err) {
     return res.status(500).json({ status: 500, message: err.message });
@@ -691,10 +705,11 @@ const calculateHours = async (req, res) => {
     let hoursPerDay = {
       allTimes: 0,
       thisTwoWeeks: 0,
-      thisMonth: 0,
-      lastMonth: 0,
-      thisYear: 0,
-      lastYear: 0,
+      pastTwoWeeks: 0,
+      // thisMonth: 0,
+      // lastMonth: 0,
+      // thisYear: 0,
+      // lastYear: 0,
     };
     //returns an array of default colors already in use.
     let hours = await db
@@ -717,31 +732,55 @@ const calculateHours = async (req, res) => {
       */
       )
       .toArray();
+    // all hours
 
-    if (hours.length > 0) {
+    let CurrentBiweekStartingIndex = getCurrentBiweekStartingIndex(hours);
+    // if getCurrentBiweekStartingIndex < 0 there are no current shifts
+    // can update this later for when there are no current shifts but there
+    // but there is a previous or next week in the database (there cant
+    // be a future week without a current week the way we add weeks.)
+    if (hours.length > 0 && CurrentBiweekStartingIndex >= 0) {
       hours.forEach((hour, index) => {
-        let total = 0;
+        let shiftHours = 0;
         if (hour.shift1.name === username) {
           if (hour.shift1.start === 24) {
-            total = total - 24 + hour.shift1.end - hour.shift1.start;
+            shiftHours = shiftHours - 24 + hour.shift1.end - hour.shift1.start;
           } else {
-            total = total = total + hour.shift1.end - hour.shift1.start;
+            shiftHours = shiftHours + hour.shift1.end - hour.shift1.start;
           }
         }
 
         if (hour.shift2.name === username) {
-          total = hour.shift2.end - hour.shift2.start;
+          shiftHours = shiftHours + hour.shift2.end - hour.shift2.start;
         }
 
         if (hour.shift3.name === username) {
           if (hour.shift3.end < hour.shift3.start) {
-            total = total + 24 + hour.shift3.end - hour.shift3.start;
+            shiftHours = shiftHours + 24 + hour.shift3.end - hour.shift3.start;
           } else {
-            total = total = total + hour.shift3.end - hour.shift3.start;
+            shiftHours = shiftHours + hour.shift3.end - hour.shift3.start;
           }
         }
-
-        hoursPerDay.allTimes += total;
+        //all times
+        hoursPerDay.allTimes = hoursPerDay.allTimes + shiftHours;
+        if (
+          //2 current weeks time
+          CurrentBiweekStartingIndex <= index &&
+          CurrentBiweekStartingIndex + 14 > index
+          // CurrentBiweekStartingIndex + 14 ===
+          // index
+        ) {
+          hoursPerDay.thisTwoWeeks = hoursPerDay.thisTwoWeeks + shiftHours;
+        }
+        if (
+          //2 past 2 weeks time
+          CurrentBiweekStartingIndex - 14 >= 0 &&
+          CurrentBiweekStartingIndex - 14 <= index &&
+          CurrentBiweekStartingIndex > index
+        ) {
+          console.log(CurrentBiweekStartingIndex, index);
+          hoursPerDay.pastTwoWeeks = hoursPerDay.pastTwoWeeks + shiftHours;
+        }
       });
     }
 

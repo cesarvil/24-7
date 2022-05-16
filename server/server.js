@@ -4,6 +4,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 
+const { sendSchedule } = require("./src/users/helpers/mailer");
+
 const {
   Signup,
   Login,
@@ -40,6 +42,7 @@ express()
 
   .get("/api/schedule/:scheduleId", getSchedule) // gets all days
   .get("/api/schedule/:scheduleId/:_id", getDay) // gets single day
+  .get("/api/email/:scheduleId/:email", sendSchedule) //email schedule
   .post("/api/new-week", addWeek) // add a week
   .post("/api/schedule-deletion", deleteAll) // delete all documents in days collection
   .post("/api/shift-name", modifyShiftName) // modify in a shift
