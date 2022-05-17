@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-
+import { breakpoints } from "../GlobalStyles";
 import { employeeColors } from "../GlobalStyles";
 
 const Shift = ({
@@ -22,30 +22,8 @@ const Shift = ({
   past,
 }) => {
   const hours = [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12,
-    13,
-    14,
-    15,
-    16,
-    17,
-    18,
-    19,
-    20,
-    21,
-    22,
-    23,
-    24,
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+    22, 23, 24,
   ];
 
   const handleShiftNameChange = (name, _id, shift, shiftName) => {
@@ -235,6 +213,20 @@ const Shift = ({
       .catch((err) => console.log(err));
   };
 
+  const hourToAmPm = (hour) => {
+    let toAmPm;
+    if (hour < 12) {
+      toAmPm = `${hour} A.M`;
+    } else if (hour === 12) {
+      toAmPm = `12 P.M.`;
+    } else if (hour === 24) {
+      toAmPm = `12 A.M.`;
+    } else {
+      toAmPm = `${hour - 12} P.M`;
+    }
+    return toAmPm;
+  };
+
   return (
     <Wrapper
       scheduleUsers={scheduleUsers}
@@ -329,7 +321,7 @@ const Shift = ({
       {/*Start of shift selection*/}
       {!past && accessLevel === "admin" ? ( //if admin display the select elemenet
         <Hours>
-          <span>{shiftStart}H</span>
+          <span>{hourToAmPm(shiftStart)}</span>
           <Select
             firstName={firstName}
             scheduleUsers={scheduleUsers}
@@ -345,20 +337,20 @@ const Shift = ({
             onBlur={(ev) => (ev.target.value = "DEFAULT")}
           >
             <option value={"DEFAULT"} disabled>
-              {shiftStart}H
+              {hourToAmPm(shiftStart)}
             </option>
             {hours.map((hour) => {
-              return <option value={hour}>{hour}H</option>;
+              return <option value={hour}>{hourToAmPm(hour)}</option>;
             })}
           </Select>
         </Hours>
       ) : (
-        <Hours>{shiftStart}H</Hours>
+        <Hours>{hourToAmPm(shiftStart)}</Hours>
       )}
       {/*End of shift selection*/}
       {!past && accessLevel === "admin" ? ( //if admin display the select elemenet
         <Hours>
-          <span>{shiftEnd}H</span>
+          <span>{hourToAmPm(shiftEnd)}</span>
           <Select
             firstName={firstName}
             scheduleUsers={scheduleUsers}
@@ -369,15 +361,15 @@ const Shift = ({
             onBlur={(ev) => (ev.target.value = "DEFAULT")}
           >
             <option value={"DEFAULT"} disabled>
-              {shiftEnd}H
+              {hourToAmPm(shiftEnd)}
             </option>
             {hours.map((hour) => {
-              return <option value={hour}>{hour}H</option>;
+              return <option value={hour}>{hourToAmPm(hour)}</option>;
             })}
           </Select>
         </Hours>
       ) : (
-        <Hours>{shiftEnd}H</Hours>
+        <Hours>{hourToAmPm(shiftEnd)}</Hours>
       )}
     </Wrapper>
   );
@@ -386,7 +378,7 @@ const Shift = ({
 const Wrapper = styled.div`
   display: flex;
   border: 1px gray solid;
-  padding: 5px;
+  padding: 1px;
   /* filtering the user that matches the selected name, then taking the first element of the array, then the usercolor, then taking the color from employeeColors */
   background: ${(props) =>
     props.scheduleUsers && props.firstName
@@ -411,16 +403,19 @@ const Hours = styled.div`
   margin: 2px;
   border: 1px gray solid;
   overflow: initial;
-  width: 50px;
+  min-width: 55px;
+  width: 25%;
   height: 30px;
+  font-size: 13px;
+  @media (min-width: ${breakpoints.xs}) {
+    width: 55px;
+  }
 
   &:hover {
     span {
       display: none;
     }
     select {
-      width: 100%;
-      height: 100%;
       display: initial;
       appearance: none;
       color: white;
@@ -439,16 +434,16 @@ const Name = styled.div`
   margin: 2px;
   border: 1px gray solid;
   overflow: initial;
-  width: 90px;
+  min-width: 90px;
+  width: 50%;
   height: 30px;
+  font-size: 15px;
 
   &:hover {
     span {
       display: none;
     }
     select {
-      width: 100%;
-      height: 100%;
       display: initial;
       appearance: none;
       padding: 0 25%;
@@ -457,6 +452,10 @@ const Name = styled.div`
       font-family: inherit;
       outline: none;
     }
+  }
+
+  @media (min-width: ${breakpoints.xs}) {
+    width: 55px;
   }
 `;
 

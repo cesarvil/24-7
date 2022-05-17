@@ -31,10 +31,11 @@ function App() {
 const Wrapper = styled.div`
   display: flex;
   width: 100%;
-  max-width: 1400px;
-  @media (max-width: 768px) {
+  padding: 1px;
+
+  /* @media (max-width: 768px) {
     flex-direction: column;
-  }
+  } */
 `;
 
 export default App;

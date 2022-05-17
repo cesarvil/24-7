@@ -143,9 +143,8 @@ const getSchedule = async (req, res) => {
         error: "getSchedule : No shifts in the currentSchedulebase",
       });
     } else {
-      let todayBiweekStartingIndex = getCurrentBiweekStartingIndex(
-        currentSchedule
-      );
+      let todayBiweekStartingIndex =
+        getCurrentBiweekStartingIndex(currentSchedule);
       // let today = new Date("May 22, 2022 00:00:00"); /*"May 22, 2022 00:00:00"*/
       // let indexToStart = -14;
       // let date1 = currentSchedule[0]._id;
@@ -543,7 +542,9 @@ const modifyEndOfShift = async (req, res) => {
             "Shift2: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
         }
       } else if (
-        currentDay.shift3.end <= requestedTimeChange ||
+        (currentDay.shift3.end <= requestedTimeChange &&
+          requestedTimeChange !== 24) ||
+        currentDay.shift3.end < requestedTimeChange ||
         currentDay.shift3.end - requestedTimeChange > 14 ||
         currentDay.shift2.start >= requestedTimeChange ||
         -currentDay.shift2.start + requestedTimeChange > 14
@@ -706,7 +707,7 @@ const calculateHours = async (req, res) => {
       allTimes: 0,
       thisTwoWeeks: 0,
       pastTwoWeeks: 0,
-      // thisMonth: 0,
+      // thisMonth: 0, //this ones can be retrieved with the ids to date
       // lastMonth: 0,
       // thisYear: 0,
       // lastYear: 0,
@@ -725,7 +726,7 @@ const calculateHours = async (req, res) => {
         },
         {
           projection: {
-            shift3: { start: 1, end: 1 },
+            shift3: { name: 1, start: 1, end: 1 },
             _id: 0,
           },
         }
@@ -741,10 +742,10 @@ const calculateHours = async (req, res) => {
     // be a future week without a current week the way we add weeks.)
     if (hours.length > 0 && CurrentBiweekStartingIndex >= 0) {
       hours.forEach((hour, index) => {
-        let shiftHours = 0;
+        let shiftHours = 0; // total hours per day
         if (hour.shift1.name === username) {
           if (hour.shift1.start === 24) {
-            shiftHours = shiftHours - 24 + hour.shift1.end - hour.shift1.start;
+            shiftHours = shiftHours + hour.shift1.end;
           } else {
             shiftHours = shiftHours + hour.shift1.end - hour.shift1.start;
           }
@@ -767,8 +768,6 @@ const calculateHours = async (req, res) => {
           //2 current weeks time
           CurrentBiweekStartingIndex <= index &&
           CurrentBiweekStartingIndex + 14 > index
-          // CurrentBiweekStartingIndex + 14 ===
-          // index
         ) {
           hoursPerDay.thisTwoWeeks = hoursPerDay.thisTwoWeeks + shiftHours;
         }
@@ -781,6 +780,7 @@ const calculateHours = async (req, res) => {
           console.log(CurrentBiweekStartingIndex, index);
           hoursPerDay.pastTwoWeeks = hoursPerDay.pastTwoWeeks + shiftHours;
         }
+        console.log(shiftHours);
       });
     }
 
