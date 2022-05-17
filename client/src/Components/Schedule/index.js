@@ -2,6 +2,7 @@ import styled from "styled-components";
 import React, { useEffect, useState, useContext } from "react";
 
 import Day from "./Day";
+import { breakpoints } from "../GlobalStyles";
 
 import { CurrentUserContext } from "../CurrentUserContext";
 
@@ -95,44 +96,76 @@ const Schedule = () => {
 
   return (
     <Wrapper>
-      <button onClick={() => handleAddWeek()}>Add 2 Weeks</button>
-      <button onClick={() => handleDeleteLastTwoWeeks()}>
-        Remove last 2 weeks
-      </button>{" "}
-      <button onClick={() => handleEmailSchedule()}>Email Schedule</button>
+      {currentUser && currentUser.schedule.accessLevel === "admin" && (
+        <Week>
+          {/*create component to hold buttons */}
+          <Button onClick={() => handleAddWeek()}>Add 2 Weeks</Button>
+          <Button onClick={() => handleDeleteLastTwoWeeks()}>
+            Remove last 2 weeks
+          </Button>
+          <Button onClick={() => handleEmailSchedule()}>Email Schedule</Button>
+        </Week>
+      )}
       {allDays !== null &&
         allDays &&
-        currentUser &&
-        allDays
-          .filter((_, index) => index % 7 === 0) // amount of weeks. just using the index.
+        allDays //14 for every 2 weeks, to make weekly, change next two 14 for 7 and leave 1 week component instead of 2
+          .filter((_, index) => index % 14 === 0) // amount of weeks. just using the index.
           .map((_, index) => {
-            let weekIndex = index * 7;
+            let weekIndex = index * 14;
             let dayIndex = weekIndex - 1;
             return (
-              <Week key={`Week-${index + 1}`}>
-                {
-                  //index times 7 to match the index in days.
-                  allDays.slice(weekIndex, weekIndex + 7).map((day) => {
-                    dayIndex++;
-                    return (
-                      <Day
-                        key={`Day-${day._id}`}
-                        dayx={day}
-                        _id={day._id}
-                        scheduleId={currentUser.schedule.scheduleId}
-                        accessLevel={currentUser.schedule.accessLevel}
-                        currentUserName={currentUser.firstName}
-                        bToken={currentUser.accessToken}
-                        scheduleUsers={scheduleUsers}
-                        allDays={allDays}
-                        setAllDays={setAllDays}
-                        dayIndex={dayIndex}
-                        past={false}
-                      />
-                    );
-                  })
-                }
-              </Week>
+              <>
+                <Week key={`Week-${index + 1}`}>
+                  {
+                    //index times 7 to match the index in days.
+                    allDays.slice(weekIndex, weekIndex + 7).map((day) => {
+                      dayIndex++;
+                      return (
+                        <Day
+                          key={`Day-${day._id}`}
+                          dayx={day}
+                          _id={day._id}
+                          scheduleId={currentUser.schedule.scheduleId}
+                          accessLevel={currentUser.schedule.accessLevel}
+                          currentUserName={currentUser.firstName}
+                          bToken={currentUser.accessToken}
+                          scheduleUsers={scheduleUsers}
+                          allDays={allDays}
+                          setAllDays={setAllDays}
+                          dayIndex={dayIndex}
+                          past={false}
+                        />
+                      );
+                    })
+                  }
+                </Week>
+
+                <Week key={`Week-${index + 2}`}>
+                  {
+                    //index times 7 to match the index in days.
+                    allDays.slice(weekIndex, weekIndex + 7).map((day) => {
+                      dayIndex++;
+                      return (
+                        <Day
+                          key={`Day-${day._id}`}
+                          dayx={day}
+                          _id={day._id}
+                          scheduleId={currentUser.schedule.scheduleId}
+                          accessLevel={currentUser.schedule.accessLevel}
+                          currentUserName={currentUser.firstName}
+                          bToken={currentUser.accessToken}
+                          scheduleUsers={scheduleUsers}
+                          allDays={allDays}
+                          setAllDays={setAllDays}
+                          dayIndex={dayIndex}
+                          past={false}
+                        />
+                      );
+                    })
+                  }
+                </Week>
+                <Divider />
+              </>
             );
           })}
     </Wrapper>
@@ -142,30 +175,41 @@ const Schedule = () => {
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  background: #e6f4ff;
+  width: 100%;
+  margin: 0 10px;
 `;
 
 const Week = styled.div`
   display: flex;
-  margin: 20px;
-  border: 1px gray solid;
-`;
+  justify-content: center;
+  margin: 5px 0;
+  flex-wrap: wrap;
 
-//styling doesnt work on mac
-const Select = styled.select`
+  @media (min-width: ${breakpoints.xs}) {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    width: 100%;
+    margin: 5px 23px;
+  }
+`;
+const Divider = styled.div`
+  margin: 15px 10px;
   width: 100%;
-  height: 100%;
-  display: initial;
-  appearance: none;
-  padding: 5px;
-  background-color: black;
-  color: white;
-  border: none;
-  font-family: inherit;
-  outline: none;
 `;
 
-const Sample = styled.h2`
-  background-color: ${(props) => props.chosenColor};
+const Button = styled.button`
+  background-color: #21a1fc;
+  color: white;
+  font-weight: bold;
+  border-radius: 50px;
+  @media (min-width: ${breakpoints.xs}) {
+    width: 200px;
+    margin: 50px;
+
+    padding: 10px 20px;
+  }
 `;
 
 export default Schedule;

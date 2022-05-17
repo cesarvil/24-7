@@ -1,6 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 
-export const breakpoints = { tablet: "768px" }; //@media only screen and (min-device-width : 768px)
+export const breakpoints = { xs: "600px" }; //@media only screen and (min-device-width : 768px)
 
 export const employeeColors = {
   navy: "#001f3f",
@@ -40,7 +40,9 @@ export default createGlobalStyle`
         font-size: 100%;
         vertical-align: baseline;
         box-sizing: border-box;
-        font-family: 'Open Sans', sans-serif;
+        font-family: "Lato", sans-serif;
+        font-family: "Poppins", sans-serif;
+        max-width: 1600px;
     }
     /* HTML5 display-role reset for older browsers */
     article, aside, details, figcaption, figure,
@@ -48,9 +50,7 @@ export default createGlobalStyle`
         display: block;
     }
     body {
-        /* line-height: 1;
-        margin-right: 10vw;
-        margin-left: 10vw; */
+      background: #e6f4ff;
     }
     ol, ul {
         list-style: none;

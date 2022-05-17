@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-
+import { breakpoints } from "../GlobalStyles";
 import Shift from "./Shift";
 
 const Days = ({
@@ -100,12 +100,13 @@ export default Days;
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 20px 1px;
+  margin: 5px 1px;
   border: 1px gray solid;
   border-radius: 5px;
-  * {
-    font-family: "Lato", sans-serif;
-    font-family: "Poppins", sans-serif;
+  min-width: 220px;
+  width: 75%;
+  @media (min-width: ${breakpoints.xs}) {
+    width: 220px;
   }
 `;
 
