@@ -2,6 +2,7 @@ import styled from "styled-components";
 import React, { useState, useContext } from "react";
 import ActivateAccount from "./ActivateAccount";
 import { CurrentUserContext } from "./CurrentUserContext";
+import { breakpoints } from "./GlobalStyles";
 
 const Login = () => {
   const [userInfo, setUserInfo] = useState([]);
@@ -90,7 +91,25 @@ const Login = () => {
   );
 };
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-background-color);
+  width: 100%;
+  margin: 0 10px;
+
+  @media (min-width: ${breakpoints.xs}) {
+    justify-content: center;
+    align-items: center;
+  }
+
+  @media (min-width: ${breakpoints.xl}) {
+    justify-content: center;
+    align-items: center;
+  }
+`;
 
 const Email = styled.input``;
 

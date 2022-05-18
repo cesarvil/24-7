@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import { Link, NavLink } from "react-router-dom";
 import { breakpoints } from "../GlobalStyles";
@@ -8,24 +8,14 @@ import { CurrentUserContext } from "../CurrentUserContext";
 import logo from "./24.png"; //https://toppng.com/open-24-hrs-a-day-24-7-icon-PNG-free-PNG-Images_167344
 
 const Header = () => {
-  const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
-  const widthLimit = Number(breakpoints.xs.split("px")[0]); // Removing px from the string and casting it to number
-  const [isMobile, setIsMobile] = useState(window.innerWidth < widthLimit); // Checks window size
+  const { currentUser, setCurrentUser, isMobile } =
+    useContext(CurrentUserContext);
+
   const logout = () => {
     //resetting current user, removing token from localstoarge
     setCurrentUser();
     localStorage.removeItem("btkn");
   };
-
-  const mediaQuery = () => {
-    setIsMobile(window.innerWidth < widthLimit);
-  };
-
-  useEffect(() => {
-    window.addEventListener("resize", mediaQuery);
-    return () => window.removeEventListener("resize", mediaQuery);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <Wrapper>
@@ -103,18 +93,18 @@ const Wrapper = styled.div`
   background-color: #dbefff;
   font-size: 15px;
   min-width: 380px;
-  border-bottom: 3px #69c0ff solid;
+  border-bottom: 1mm #69c0ff ridge;
+  box-shadow: -10px 0 10px #69c0ff, -10px 0 20px #69c0ff, -10px 0 30px #69c0ff;
 
   @media (min-width: ${breakpoints.xs}) {
+    padding: 10px 10px;
+  }
+
+  @media (min-width: ${breakpoints.s}) {
     height: 70px;
     align-items: center;
     padding: 10px 50px;
   }
-  /* 
-  @media (min-width: ${"500px"}) {
-    height: 60px;
-    align-items: center;
-  } */
 `;
 
 const InnerWrapper = styled.div`
@@ -122,9 +112,20 @@ const InnerWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   margin: 0 5px 5px 5px;
-  min-width: 120px;
-  @media (min-width: ${breakpoints.xs}) {
+  min-width: 100px;
+  font-size: 12px;
+  /* @media (min-width: ${breakpoints.xs}) {
     width: 200px;
+    margin: 0;
+    font-size: initial;
+    align-items: flex-end;
+  } */
+
+  @media (min-width: ${breakpoints.s}) {
+    width: 200px;
+    margin: 0;
+    font-size: initial;
+    align-items: flex-end;
   }
 `;
 
@@ -132,10 +133,9 @@ const LogoWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   margin-bottom: 55px;
 
-  @media (min-width: ${breakpoints.xs}) {
+  @media (min-width: ${breakpoints.s}) {
     align-items: center;
     margin-bottom: 0;
   }
@@ -151,7 +151,9 @@ const IconLink = styled(NavLink)`
   height: 35px;
   width: 35px;
   font-weight: bold;
+
   &.active {
+    box-shadow: 0 0 5px #69c0ff, 0 0 10px #69c0ff, 0 0 15px #69c0ff;
     background-color: #80c6ff;
     border-radius: 100px;
     height: 30px;
@@ -170,6 +172,54 @@ const Logo = styled.img`
   height: 50px;
   width: 50px;
   margin-right: 5px;
+  z-index: 51;
+
+  animation: slide 20s ease;
+  animation-iteration-count: infinite;
+
+  /*disabling animation when user selects reduce
+    motion in their operative system*/
+  @media (prefers-reduced-motion) {
+    animation: none;
+  }
+
+  @keyframes slide {
+    0% {
+      transform: rotate(-360deg);
+    }
+    40% {
+      transform: rotate(-360deg);
+    }
+
+    50% {
+      transform: rotate(-450deg);
+    }
+
+    60% {
+      transform: rotate(450deg);
+    }
+    70% {
+      transform: rotate(330deg);
+    }
+    80% {
+      transform: rotate(390deg);
+    }
+    90% {
+      transform: rotate(350deg);
+    }
+    94% {
+      transform: rotate(365deg);
+    }
+    96% {
+      transform: rotate(357deg);
+    }
+    98% {
+      transform: rotate(362deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 `;
 
 const NameLink = styled(NavLink)`
@@ -181,11 +231,15 @@ const NameLink = styled(NavLink)`
   align-items: center;
 
   &.active {
+    box-shadow: 0 0 5px #69c0ff, 0 0 10px #69c0ff, 0 0 15px #69c0ff;
     background-color: #80c6ff;
     border-radius: 100px;
     padding: 5px;
     color: white;
   }
 `;
+
+// background: var(--primary-background-color);
+// color: var(--primary-color); try to do dark mode for header as well
 
 export default Header;

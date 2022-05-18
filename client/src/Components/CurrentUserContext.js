@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
+import { breakpoints } from "./GlobalStyles";
 
 export const CurrentUserContext = createContext(null);
 //calling state before fetch and after fetch
@@ -6,6 +7,18 @@ const initialState = {};
 
 export const CurrentUserProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState();
+  const widthLimit = Number(breakpoints.s.split("px")[0]); // Removing px from the string and casting it to number
+  const [isMobile, setIsMobile] = useState(window.innerWidth < widthLimit); // Checks window size
+  const [darkMode, setDarkMode] = useState(false); // Checks window size
+  const mediaQuery = () => {
+    setIsMobile(window.innerWidth < widthLimit);
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", mediaQuery);
+    return () => window.removeEventListener("resize", mediaQuery);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const localToken = localStorage.getItem("btkn");
@@ -38,7 +51,14 @@ export const CurrentUserProvider = ({ children }) => {
 
   return (
     <CurrentUserContext.Provider
-      value={{ currentUser, setCurrentUser, getCurrentUserInfo }}
+      value={{
+        currentUser,
+        setCurrentUser,
+        getCurrentUserInfo,
+        isMobile,
+        darkMode,
+        setDarkMode,
+      }}
     >
       {children}
     </CurrentUserContext.Provider>

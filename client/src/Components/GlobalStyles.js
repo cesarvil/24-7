@@ -1,14 +1,20 @@
 import { createGlobalStyle } from "styled-components";
 
-export const breakpoints = { xs: "600px" }; //@media only screen and (min-device-width : 768px)
+export const breakpoints = {
+  xs: "600px",
+  s: "768px",
+  l: "1024px",
+  xl: "1600px",
+}; //@media only screen and (min-device-width : 768px)
 
 export const employeeColors = {
   navy: "#001f3f",
-  blue: "#0074D9",
-  teal: "#22bab5",
-  yellow: "#FFDC00",
-  purple: "#B10DC9",
-  maroon: "#85144b",
+  blue: "#21a1fc",
+  teal: "#21e2fc",
+  yellow: "#f8fc21",
+  green: "#40bd57",
+  purple: "#e6a8ff",
+  maroon: "#ffa8b8",
   silver: "#DDDDDD",
   red: "#FF4136",
   orange: "#FF851B",
@@ -18,7 +24,9 @@ export const employeeColors = {
 
 export default createGlobalStyle`
     :root {
-      --primary-color: #145173;
+      --primary-background-color: ${(props) =>
+        props.darkMode ? "black" : "#fff5ff"};
+            --primary-color: ${(props) => (props.darkMode ? "white" : "black")};
     }
 
     html, body, div, span, applet, object, iframe,
@@ -43,6 +51,7 @@ export default createGlobalStyle`
         font-family: "Lato", sans-serif;
         font-family: "Poppins", sans-serif;
         max-width: 1600px;
+        
     }
     /* HTML5 display-role reset for older browsers */
     article, aside, details, figcaption, figure,
@@ -50,7 +59,8 @@ export default createGlobalStyle`
         display: block;
     }
     body {
-      background: #e6f4ff;
+      background:var(--primary-background-color);
+      color: var(--primary-color);
     }
     ol, ul {
         list-style: none;

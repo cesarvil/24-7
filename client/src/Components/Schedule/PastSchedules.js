@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import React, { useEffect, useState, useContext } from "react";
+import { breakpoints } from "../GlobalStyles";
 
 import Day from "./Day";
 
@@ -87,30 +88,60 @@ const PastSchedule = () => {
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-background-color);
+  width: 100%;
+  margin: 0 10px;
+
+  @media (min-width: ${breakpoints.xs}) {
+    justify-content: center;
+    align-items: center;
+  }
+
+  @media (min-width: ${breakpoints.xl}) {
+    justify-content: center;
+    align-items: center;
+  }
 `;
 
 const Week = styled.div`
   display: flex;
-  margin: 20px;
-  border: 1px gray solid;
-`;
+  justify-content: center;
+  margin: 5px 0;
+  flex-wrap: wrap;
+  @media (min-width: ${breakpoints.xs}) {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    width: 100%;
+    margin: 5px 23px;
+  }
 
-//styling doesnt work on mac
-const Select = styled.select`
-  width: 100%;
-  height: 100%;
-  display: initial;
-  appearance: none;
-  padding: 5px;
-  background-color: black;
-  color: white;
-  border: none;
-  font-family: inherit;
-  outline: none;
-`;
+  @media (min-width: ${breakpoints.xl}) {
+    margin: 5px 0;
+    justify-content: center;
+  }
 
-const Sample = styled.h2`
-  background-color: ${(props) => props.chosenColor};
+  animation: vanish 1s linear;
+  animation-iteration-count: 1;
+
+  /*disabling animation when user selects reduce
+    motion in their operative system*/
+  @media (prefers-reduced-motion) {
+    animation: none;
+  }
+
+  @keyframes vanish {
+    0% {
+      opacity: 0.1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
 `;
 
 export default PastSchedule;

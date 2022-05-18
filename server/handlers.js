@@ -28,12 +28,14 @@ const getCurrentBiweekStartingIndex = (allShifts) => {
   if (allShifts.length === 0) {
     return null;
   }
-  //change today date for testing
+  //change today's date for TESTING
   let today = new Date(); /*"May 22, 2022 00:00:00"*/
   let indexToStart = -14;
   let date1 = allShifts[0]._id;
-  date2 = addSubstractDays(idToDate(allShifts[allShifts.length - 1]._id), 14);
-  let pastSchedule = [];
+  let date2 = addSubstractDays(
+    idToDate(allShifts[allShifts.length - 1]._id),
+    14
+  );
   date1 = idToDate(date1);
 
   if (today < date1 && today < date2) {
@@ -42,8 +44,6 @@ const getCurrentBiweekStartingIndex = (allShifts) => {
   } else if (today > date1 && today > date2) {
     // today after than any shift
     return -2;
-    pastSchedule = allShifts;
-    allShifts = [];
   } else if (today >= date1 && today <= date2) {
     //past and current schedule logic
     do {

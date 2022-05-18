@@ -236,7 +236,7 @@ const Shift = ({
       {/*Name selection*/}
       {!past && accessLevel === "admin" ? ( //if admin display the select elemenet
         <Name>
-          <span>{firstName}</span>
+          <span>{firstName.charAt(0).toUpperCase() + firstName.slice(1)}</span>
           <Select
             firstName={firstName}
             scheduleUsers={scheduleUsers}
@@ -255,7 +255,12 @@ const Shift = ({
               {firstName}
             </option>
             {scheduleUsers.map((user) => {
-              return <option value={user.firstName}>{user.firstName}</option>;
+              return (
+                <option value={user.firstName}>
+                  {user.firstName.charAt(0).toUpperCase() +
+                    user.firstName.slice(1)}
+                </option>
+              );
             })}
           </Select>
         </Name>
@@ -263,7 +268,7 @@ const Shift = ({
         accessLevel === "regular" &&
         firstName === currentUserName ? ( //request to be replaced
         <Name>
-          <span>{firstName}</span>
+          <span>{firstName.charAt(0).toUpperCase() + firstName.slice(1)}</span>
           <Select
             firstName={firstName}
             status={status}
@@ -316,7 +321,7 @@ const Shift = ({
           </Select>
         </Name>
       ) : (
-        <Name>{firstName}</Name>
+        <Name>{firstName.charAt(0).toUpperCase() + firstName.slice(1)}</Name>
       )}
       {/*Start of shift selection*/}
       {!past && accessLevel === "admin" ? ( //if admin display the select elemenet
@@ -401,7 +406,7 @@ const Hours = styled.div`
   justify-content: center;
   align-items: center;
   margin: 2px;
-  border: 1px gray solid;
+
   overflow: initial;
   min-width: 55px;
   width: 25%;
@@ -432,7 +437,7 @@ const Name = styled.div`
   justify-content: center;
   align-items: center;
   margin: 2px;
-  border: 1px gray solid;
+
   overflow: initial;
   min-width: 90px;
   width: 50%;
