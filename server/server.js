@@ -13,6 +13,7 @@ const {
   Logout,
   getCurrentUserInfo,
   usersInScheduleId,
+  ToggleDarkMode,
 } = require("./src/users/user.controller"); //stopping here
 
 const { validateToken } = require("./middlewares/validateToken");
@@ -59,6 +60,7 @@ express()
   .get("/api/users/:scheduleId", usersInScheduleId) // get all users belonging to 1 schedule
   .get("/api/user-info", validateToken, getCurrentUserInfo) //validate token is a middleware,
 
+  .patch("/api/dark", ToggleDarkMode) // activate email acount with code
   .get("/api/logout", validateToken, Logout)
   .get("/api/new-schedule", createSchedule) // new Collection
   .use((req, res) => res.status(404).type("txt").send("🤷‍♂️"))

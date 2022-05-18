@@ -23,6 +23,7 @@ const userSchema = new Schema(
     accessToken: { type: String, default: null },
     firstName: { type: String, required: true },
     surname: { type: String, required: true },
+    dark: { type: Boolean, default: false },
     schedule: scheduleInfoSchema,
   },
   {

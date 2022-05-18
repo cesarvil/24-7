@@ -123,7 +123,7 @@ const DayMonth = styled.div`
   background-color: gray;
   ${(props) =>
     props.today === props._id &&
-    "font-weight: bold ; color : white ; padding : 3px 0; animation: x 3s linear; border-radius: 5px 5px 0 0"};
+    "font-weight: bold ; color : white ; padding : 3px 0; animation: glow 3s linear; border-radius: 5px 5px 0 0"};
 
   animation-iteration-count: infinite;
 
@@ -133,7 +133,7 @@ const DayMonth = styled.div`
     animation: none;
   }
 
-  @keyframes x {
+  @keyframes glow {
     0% {
       box-shadow: 0 -1px 5px #2196f3, 0 -1px 8px #2196f3, 0 -1px 5px #2196f3;
     }

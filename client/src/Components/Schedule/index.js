@@ -10,7 +10,7 @@ const Schedule = () => {
   const [allDays, setAllDays] = useState(null);
   const [lastId, setLastId] = useState(null);
   const [scheduleUsers, setScheduleUsers] = useState(null);
-  const { currentUser, darkMode } = useContext(CurrentUserContext);
+  const { currentUser } = useContext(CurrentUserContext);
   const [showButtons, setShowButtons] = useState(false);
 
   const dateToId = (date) => {
@@ -24,11 +24,10 @@ const Schedule = () => {
     return Number(date);
   };
 
-  let today = new Date("May 23, 2022 00:00:00");
+  let today = new Date(); //"May 23, 2022 00:00:00" for testing
   today = dateToId(today);
 
   useEffect(() => {
-    console.log("schedule effect");
     //fetching all days and putting them in state
 
     const getSchedule = () => {

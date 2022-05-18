@@ -26,7 +26,7 @@ export default createGlobalStyle`
     :root {
       --primary-background-color: ${(props) =>
         props.darkMode ? "black" : "#fff5ff"};
-            --primary-color: ${(props) => (props.darkMode ? "white" : "black")};
+      --primary-color: ${(props) => (props.darkMode ? "white" : "black")};
     }
 
     html, body, div, span, applet, object, iframe,

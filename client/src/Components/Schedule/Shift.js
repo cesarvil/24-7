@@ -238,6 +238,7 @@ const Shift = ({
         <Name>
           <span>{firstName.charAt(0).toUpperCase() + firstName.slice(1)}</span>
           <Select
+            status={status}
             firstName={firstName}
             scheduleUsers={scheduleUsers}
             defaultValue={"DEFAULT"}
@@ -252,7 +253,7 @@ const Shift = ({
             onBlur={(ev) => (ev.target.value = "DEFAULT")}
           >
             <option value={"DEFAULT"} disabled>
-              {firstName}
+              {firstName.charAt(0).toUpperCase() + firstName.slice(1)}
             </option>
             {scheduleUsers.map((user) => {
               return (
@@ -299,8 +300,9 @@ const Shift = ({
         firstName !== currentUserName &&
         status === "change" ? ( //Accept someones else request
         <Name>
-          <span>{firstName}</span>
+          <span>{firstName.charAt(0).toUpperCase() + firstName.slice(1)}</span>
           <Select
+            status={status}
             firstName={firstName}
             scheduleUsers={scheduleUsers}
             defaultValue={"DEFAULT"}
@@ -328,6 +330,7 @@ const Shift = ({
         <Hours>
           <span>{hourToAmPm(shiftStart)}</span>
           <Select
+            status={status}
             firstName={firstName}
             scheduleUsers={scheduleUsers}
             defaultValue={"DEFAULT"}
@@ -357,6 +360,7 @@ const Shift = ({
         <Hours>
           <span>{hourToAmPm(shiftEnd)}</span>
           <Select
+            status={status}
             firstName={firstName}
             scheduleUsers={scheduleUsers}
             defaultValue={"DEFAULT"}
@@ -406,12 +410,11 @@ const Hours = styled.div`
   justify-content: center;
   align-items: center;
   margin: 2px;
-
   overflow: initial;
   min-width: 55px;
   width: 25%;
   height: 30px;
-  font-size: 13px;
+  font-size: 14px;
   @media (min-width: ${breakpoints.xs}) {
     width: 55px;
   }
@@ -421,6 +424,9 @@ const Hours = styled.div`
       display: none;
     }
     select {
+      padding: 0 8px;
+      font-size: 14px;
+      text-align: center;
       display: initial;
       appearance: none;
       color: white;
@@ -437,7 +443,6 @@ const Name = styled.div`
   justify-content: center;
   align-items: center;
   margin: 2px;
-
   overflow: initial;
   min-width: 90px;
   width: 50%;
@@ -449,9 +454,11 @@ const Name = styled.div`
       display: none;
     }
     select {
+      font-size: 15px;
+      text-align: center;
       display: initial;
       appearance: none;
-      padding: 0 25%;
+      padding: 0 8px;
       color: white;
       border: none;
       font-family: inherit;
@@ -468,8 +475,8 @@ const Select = styled.select`
   display: none;
   background: ${(props) =>
     props.scheduleUsers && props.firstName
-      ? props.firstName === ""
-        ? "gray"
+      ? props.status === "change"
+        ? employeeColors.orange
         : employeeColors[
             props.scheduleUsers.filter(
               (user) => props.firstName === user.firstName

@@ -9,7 +9,8 @@ export const CurrentUserProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState();
   const widthLimit = Number(breakpoints.s.split("px")[0]); // Removing px from the string and casting it to number
   const [isMobile, setIsMobile] = useState(window.innerWidth < widthLimit); // Checks window size
-  const [darkMode, setDarkMode] = useState(false); // Checks window size
+  const [darkMode, setDarkMode] = useState(false); // dark mode state
+
   const mediaQuery = () => {
     setIsMobile(window.innerWidth < widthLimit);
   };
@@ -24,6 +25,7 @@ export const CurrentUserProvider = ({ children }) => {
     const localToken = localStorage.getItem("btkn");
 
     if (localToken) {
+      //for persistent user sessions
       getCurrentUserInfo(localToken);
     }
   }, []);
@@ -44,6 +46,7 @@ export const CurrentUserProvider = ({ children }) => {
           console.log(data.message);
         } else {
           setCurrentUser(data.user);
+          setDarkMode(data.user.dark);
         }
       })
       .catch((err) => alert("context error") /*setLoginError(err.message)*/);

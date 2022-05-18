@@ -28,16 +28,36 @@ const Profile = () => {
     }
   }, [currentUser]);
 
-  const handleDarkMode = () => {
-    setDarkMode(!darkMode);
-    console.log(darkMode);
+  const handleDarkMode = (ev) => {
+    setDarkMode(!darkMode); // optimistic rendering
+    fetch("/api/dark", {
+      method: "PATCH",
+      body: JSON.stringify({
+        email: currentUser.email,
+        darkMode: !darkMode, // setDarkMode(!darkMode) jas a delay so still passing !
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          setDarkMode(!darkMode);
+          console.log(data.error);
+        }
+      })
+      .catch((err) => console.log(err.message));
+
+    ev.preventDefault();
   };
 
   return (
     <Wrapper>
       <h1>PROFILE</h1>
       <DarkModeContainer>
-        <IconButton onClick={() => handleDarkMode()}>
+        <IconButton onClick={(ev) => handleDarkMode(ev)}>
           Dark Mode:
           {darkMode ? (
             <MdOutlineDarkMode size={"22px"} />
@@ -93,6 +113,8 @@ const DarkModeContainer = styled.div`
   }
 
   @media (min-width: ${breakpoints.xl}) {
+    right: initial;
+    left: 1480px;
   }
 `;
 

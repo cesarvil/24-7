@@ -1,18 +1,26 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import styled from "styled-components";
 import { Link, NavLink } from "react-router-dom";
 import { breakpoints } from "../GlobalStyles";
-import { GrSchedule, GrHistory } from "react-icons/gr";
-import { ImExit } from "react-icons/im";
+import { ImExit, ImCalendar } from "react-icons/im";
+import { MdOutlineHistory, MdAlarmOn } from "react-icons/md";
 import { CurrentUserContext } from "../CurrentUserContext";
 import logo from "./24.png"; //https://toppng.com/open-24-hrs-a-day-24-7-icon-PNG-free-PNG-Images_167344
+import logow from "./24white.png"; //https://toppng.com/open-24-hrs-a-day-24-7-icon-PNG-free-PNG-Images_167344
 
 const Header = () => {
-  const { currentUser, setCurrentUser, isMobile } =
+  const { currentUser, setCurrentUser, isMobile, darkMode, setDarkMode } =
     useContext(CurrentUserContext);
+
+  useEffect(() => {
+    if (currentUser) {
+      setDarkMode(currentUser.dark);
+    }
+  }, [currentUser]);
 
   const logout = () => {
     //resetting current user, removing token from localstoarge
+    setDarkMode(false);
     setCurrentUser();
     localStorage.removeItem("btkn");
   };
@@ -22,25 +30,31 @@ const Header = () => {
       {currentUser ? (
         <InnerWrapper>
           <IconLink to={"/schedule"}>
-            <GrSchedule size={"24px"} />
+            <ImCalendar size={"24px"} />
           </IconLink>
           <IconLink to={"/past-schedule"}>
-            <GrHistory size={"24px"} />
+            <MdOutlineHistory size={"30px"} />
           </IconLink>
         </InnerWrapper>
       ) : (
         <InnerWrapper>
           <RegularLink to={"/login"}>
-            <GrSchedule size={"24px"} />
+            <ImCalendar size={"30px"} />
           </RegularLink>
           <RegularLink to={"/login"}>
-            <GrHistory size={"24px"} />
+            <MdOutlineHistory size={"24px"} />
           </RegularLink>
         </InnerWrapper>
       )}
       <RegularLink to={"/"}>
         <LogoWrapper>
-          <Logo src={logo} />
+          {darkMode /*getComputedStyle(document.body).getPropertyValue(
+            "--primary-background-color"
+          ) === "#fff5ff" */ ? (
+            <Logo src={logow} />
+          ) : (
+            <Logo src={logo} />
+          )}
           <h6> Scheduler</h6>
         </LogoWrapper>
       </RegularLink>
@@ -90,7 +104,9 @@ const Wrapper = styled.div`
   max-width: 1600px;
   margin: 0 0 20px 0;
   padding: 0px 5px;
-  background-color: #dbefff;
+  /* background-color: #dbefff; */
+  background: var(--primary-background-color);
+  color: var(--primary-color);
   font-size: 15px;
   min-width: 380px;
   border-bottom: 1mm #69c0ff ridge;
@@ -143,7 +159,8 @@ const LogoWrapper = styled.div`
 
 const IconLink = styled(NavLink)`
   text-decoration: none;
-  color: black;
+  background: var(--primary-background-color);
+  color: var(--primary-color);
   max-height: 120px;
   display: flex;
   justify-content: center;
@@ -158,13 +175,66 @@ const IconLink = styled(NavLink)`
     border-radius: 100px;
     height: 30px;
     width: 30px;
-    padding: 5px;
+    padding: 1px;
+    animation: glowx 3s linear infinite;
+  }
+
+  @media (prefers-reduced-motion) {
+    animation: none;
+  }
+
+  @keyframes glowx {
+    0% {
+      box-shadow: 0 0 10px #21a1fc, 0 0 20px #21a1fc, 0 0 30px #21a1fc;
+    }
+    50% {
+      box-shadow: 0 0 20px #21a1fc, 0 0 40px #21a1fc, 0 0 60px #21a1fc;
+    }
+    100% {
+      box-shadow: 0 0 10px #21a1fc, 0 0 20px #21a1fc, 0 0 30px #21a1fc;
+    }
+  }
+`;
+
+const NameLink = styled(NavLink)`
+  text-decoration: none;
+  background: var(--primary-background-color);
+  color: var(--primary-color);
+  max-height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &.active {
+    box-shadow: 0 0 5px #69c0ff, 0 0 10px #69c0ff, 0 0 15px #69c0ff;
+    background-color: #80c6ff;
+    border-radius: 100px;
+    padding: 1px 5px;
+    color: white;
+    animation: glow 3s linear infinite;
+  }
+
+  @media (prefers-reduced-motion) {
+    animation: none;
+  }
+
+  @keyframes glow {
+    0% {
+      box-shadow: 0 0 5px #2196f3, 0 0 10px #2196f3, 0 0 15px #2196f3;
+    }
+    50% {
+      box-shadow: 0 0 10px #21a1fc, 0 0 20px #21a1fc, 0 0 30px #21a1fc;
+    }
+    100% {
+      box-shadow: 0 0 5px #2196f3, 0 0 10px #2196f3, 0 0 15px #2196f3;
+    }
   }
 `;
 
 const RegularLink = styled(Link)`
   text-decoration: none;
-  color: black;
+  background: var(--primary-background-color);
+  color: var(--primary-color);
 `;
 
 const Logo = styled.img`
@@ -173,8 +243,7 @@ const Logo = styled.img`
   width: 50px;
   margin-right: 5px;
   z-index: 51;
-
-  animation: slide 20s ease;
+  animation: spin 20s ease;
   animation-iteration-count: infinite;
 
   /*disabling animation when user selects reduce
@@ -183,7 +252,7 @@ const Logo = styled.img`
     animation: none;
   }
 
-  @keyframes slide {
+  @keyframes spin {
     0% {
       transform: rotate(-360deg);
     }
@@ -219,23 +288,6 @@ const Logo = styled.img`
     100% {
       transform: rotate(360deg);
     }
-  }
-`;
-
-const NameLink = styled(NavLink)`
-  text-decoration: none;
-  color: black;
-  max-height: 120px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &.active {
-    box-shadow: 0 0 5px #69c0ff, 0 0 10px #69c0ff, 0 0 15px #69c0ff;
-    background-color: #80c6ff;
-    border-radius: 100px;
-    padding: 5px;
-    color: white;
   }
 `;
 
