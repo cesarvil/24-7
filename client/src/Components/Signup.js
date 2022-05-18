@@ -8,6 +8,8 @@ import React, { useState } from "react";
 
 import ColorList from "./ColorList";
 
+import { breakpoints } from "./GlobalStyles";
+
 const Signup = () => {
   const [userInfo, setUserInfo] = useState([]);
   const [registrationSuccess, setRegistrationSuccess] = useState("");
@@ -213,7 +215,25 @@ const Signup = () => {
   );
 };
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-background-color);
+  width: 100%;
+  margin: 0 10px;
+
+  @media (min-width: ${breakpoints.xs}) {
+    justify-content: center;
+    align-items: center;
+  }
+
+  @media (min-width: ${breakpoints.xl}) {
+    justify-content: center;
+    align-items: center;
+  }
+`;
 
 const Email = styled.input``;
 

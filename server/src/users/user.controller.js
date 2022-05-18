@@ -35,7 +35,6 @@ const userSchema = Joi.object().keys({
           err.message = "Passwords must match";
         }
       });
-      console.log(errors);
       return errors;
     }),
   firstName: Joi.string()
@@ -271,9 +270,8 @@ const Activate = async (req, res) => {
 
 const Logout = async (req, res) => {
   try {
-    console.log("logout");
     mongoose.connect(process.env.MONGO_URI, options);
-    const { id } = req.decoded;
+    const { id } = req.decoded; //retreiving the id from the middleware result
     let user = await User.findOne({ userId: id });
     user.accessToken = "";
     await user.save();
@@ -294,8 +292,6 @@ const getCurrentUserInfo = async (req, res) => {
     mongoose.connect(process.env.MONGO_URI, options);
     let user = await User.findOne({ accessToken: token });
 
-    console.log(user);
-
     return res.send({ success: true, message: "User info", user: user });
   } catch (error) {
     console.error("getCurrentUserInfor", error);
@@ -309,7 +305,6 @@ const getCurrentUserInfo = async (req, res) => {
 //get the users linked to a schedule by an id, only extracting properties required to for the schedule itself
 const usersInScheduleId = async (req, res) => {
   const scheduleId = req.params.scheduleId;
-  console.log("USERS in schedule", scheduleId);
   try {
     mongoose.connect(process.env.MONGO_URI, options);
     let users = await User.find({
@@ -341,6 +336,42 @@ const usersInScheduleId = async (req, res) => {
   }
 };
 
+const ToggleDarkMode = async (req, res) => {
+  try {
+    mongoose.connect(process.env.MONGO_URI, options);
+    const { email, darkMode } = req.body;
+    if (!email) {
+      return res.json({
+        error: true,
+        status: 400,
+        message: "Please make a valid request",
+      });
+    }
+    const user = await User.findOne({
+      email: email,
+    });
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid user email",
+      });
+    } else {
+      user.dark = darkMode;
+      await user.save();
+      return res.status(200).json({
+        success: true,
+        message: "Dark/Light mode toggled.",
+      });
+    }
+  } catch (error) {
+    console.error("activation-error", error);
+    return res.status(500).json({
+      error: true,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   Signup,
   Login,
@@ -348,4 +379,5 @@ module.exports = {
   Logout,
   getCurrentUserInfo,
   usersInScheduleId,
+  ToggleDarkMode,
 };

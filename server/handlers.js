@@ -28,12 +28,14 @@ const getCurrentBiweekStartingIndex = (allShifts) => {
   if (allShifts.length === 0) {
     return null;
   }
-  //change today date for testing
+  //change today's date for TESTING
   let today = new Date(); /*"May 22, 2022 00:00:00"*/
   let indexToStart = -14;
   let date1 = allShifts[0]._id;
-  date2 = addSubstractDays(idToDate(allShifts[allShifts.length - 1]._id), 14);
-  let pastSchedule = [];
+  let date2 = addSubstractDays(
+    idToDate(allShifts[allShifts.length - 1]._id),
+    14
+  );
   date1 = idToDate(date1);
 
   if (today < date1 && today < date2) {
@@ -42,8 +44,6 @@ const getCurrentBiweekStartingIndex = (allShifts) => {
   } else if (today > date1 && today > date2) {
     // today after than any shift
     return -2;
-    pastSchedule = allShifts;
-    allShifts = [];
   } else if (today >= date1 && today <= date2) {
     //past and current schedule logic
     do {
@@ -130,7 +130,6 @@ const getLast_Id = async (scheduleId) => {
 const getSchedule = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
   const scheduleId = req.params.scheduleId;
-  console.log(scheduleId);
 
   try {
     await client.connect();
@@ -163,9 +162,6 @@ const getSchedule = async (req, res) => {
         currentSchedule = [];
       } else if (todayBiweekStartingIndex >= 0) {
         //Schedule contains shifts before this biweek and after
-        console.log(todayBiweekStartingIndex);
-        //backend for past schedule
-
         pastSchedule = currentSchedule.slice(0, todayBiweekStartingIndex); //setting past shifts
         currentSchedule.splice(0, todayBiweekStartingIndex); //setting current shifts
       }
@@ -191,7 +187,6 @@ const deleteAll = async (req, res) => {
 
   //substract 14 days to last id
   lastDay_Id = dateToId(addSubstractDays(idToDate(lastDay_Id), -14));
-  console.log(lastDay_Id);
   try {
     await client.connect();
     const db = client.db("24-7");
@@ -777,14 +772,11 @@ const calculateHours = async (req, res) => {
           CurrentBiweekStartingIndex - 14 <= index &&
           CurrentBiweekStartingIndex > index
         ) {
-          console.log(CurrentBiweekStartingIndex, index);
           hoursPerDay.pastTwoWeeks = hoursPerDay.pastTwoWeeks + shiftHours;
         }
-        console.log(shiftHours);
       });
     }
 
-    console.log(hoursPerDay);
     res.status(200).json({
       status: 200,
       success: true,
@@ -818,7 +810,6 @@ const getUsedColors = async (req, res) => {
     if (users.length > 0) {
       colorsUsed = users.map((user) => user.schedule.userColor);
     }
-    console.log(users);
     colorsUsed = colorsUsed.concat(reservedColors);
     res.status(200).json({
       status: 200,

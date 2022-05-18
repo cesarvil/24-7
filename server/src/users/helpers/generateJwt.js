@@ -6,6 +6,7 @@ const options = {
 };
 async function generateJwt(email, userId) {
   try {
+    //payload contains certain info we can decode later
     const payload = { email: email, id: userId };
     const token = await jwt.sign(payload, process.env.JWT_SECRET, options);
     return { error: false, token: token };

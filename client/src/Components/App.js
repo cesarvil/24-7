@@ -8,11 +8,15 @@ import Schedule from "./Schedule";
 import Signup from "./Signup";
 import Login from "./Login";
 import PastSchedule from "./Schedule/PastSchedules";
+import React, { useContext } from "react";
+import { CurrentUserContext } from "./CurrentUserContext";
 
 function App() {
+  const { darkMode } = useContext(CurrentUserContext);
+
   return (
     <Router>
-      <GlobalStyles />
+      <GlobalStyles darkMode={darkMode} />
       <Header />
       <Wrapper>
         <Routes>

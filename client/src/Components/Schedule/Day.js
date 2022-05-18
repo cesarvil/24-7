@@ -15,6 +15,7 @@ const Days = ({
   allDays,
   dayIndex,
   past,
+  today,
 }) => {
   const day = allDays[dayIndex];
 
@@ -34,8 +35,10 @@ const Days = ({
   // }, []);
 
   return (
-    <Wrapper>
-      <DayMonth>{day.date.dayMonth}</DayMonth>
+    <Wrapper today={today} _id={_id}>
+      <DayMonth today={today} _id={_id}>
+        {day.date.dayMonth}
+      </DayMonth>
       <Weekdays>{day.date.weekday}</Weekdays>
       <Shift
         firstName={day.shift1.name}
@@ -105,6 +108,8 @@ const Wrapper = styled.div`
   border-radius: 5px;
   min-width: 220px;
   width: 75%;
+  background: #e6f4ff;
+
   @media (min-width: ${breakpoints.xs}) {
     width: 220px;
   }
@@ -116,6 +121,34 @@ const DayMonth = styled.div`
   align-items: center;
   border: 1px gray solid;
   background-color: gray;
+  ${(props) =>
+    props.today === props._id &&
+    "font-weight: bold ; color : white ; padding : 3px 0; animation: glow 3s linear; border-radius: 5px 5px 0 0"};
+
+  animation-iteration-count: infinite;
+
+  /*disabling animation when user selects reduce
+  motion in their operative system*/
+  @media (prefers-reduced-motion) {
+    animation: none;
+  }
+
+  @keyframes glow {
+    0% {
+      box-shadow: 0 -1px 5px #2196f3, 0 -1px 8px #2196f3, 0 -1px 5px #2196f3;
+    }
+    50% {
+      box-shadow: 0 -3px 10px #21a1fc, 0 -3px 15px #21a1fc, 0 -3px 20px #21a1fc;
+    }
+    100% {
+      box-shadow: 0 -1px 5px #2196f3, 0 -1px 8px #2196f3, 0 -1px 5px #2196f3;
+    }
+  }
+
+  @media (min-width: ${breakpoints.xs}) {
+    ${(props) =>
+      props.today === props._id && "padding : 5px 0; margin-top : -10px ;"};
+  }
 `;
 
 const Weekdays = styled.div`
