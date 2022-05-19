@@ -3,6 +3,7 @@ import React, { useState, useContext } from "react";
 import ActivateAccount from "./ActivateAccount";
 import { CurrentUserContext } from "./CurrentUserContext";
 import { breakpoints } from "./GlobalStyles";
+import Button from "./Button";
 
 const Login = () => {
   const [userInfo, setUserInfo] = useState([]);
@@ -55,18 +56,26 @@ const Login = () => {
         <Message>
           <h1>{loginSuccess}</h1>
         </Message>
+      ) : loginError === activationError ? (
+        <div>
+          <Message>{loginError}</Message>
+          <ActivateAccount
+            setLoginError={setLoginError}
+            email={userInfo.email}
+          />
+        </div>
       ) : (
         <div>
-          <form onSubmit={(ev) => handleSubmit(ev)}>
+          <Form onSubmit={(ev) => handleSubmit(ev)}>
             <FormStyle>
-              <label>Email : </label>
+              <Label>Email : </Label>
               <Email
                 onChange={(ev) => handleChange(ev)}
                 placeholder={"Email address"}
                 name={"email"}
                 required
               />
-              <label>Password : </label>
+              <Label>Password : </Label>
               <Password
                 onChange={(ev) => handleChange(ev)}
                 type={"password"}
@@ -75,16 +84,9 @@ const Login = () => {
                 required
               />
             </FormStyle>
-            <input type="submit" value="Submit" />
-          </form>
-          {loginError && (
-            <div>
-              <Message>{loginError}</Message>
-              {loginError === activationError && (
-                <ActivateAccount email={userInfo.email} />
-              )}
-            </div>
-          )}
+            <Button type="submit" value="Login" />
+          </Form>
+          {loginError !== activationError && <Message>{loginError}</Message>}
         </div>
       )}
     </Wrapper>
@@ -99,6 +101,12 @@ const Wrapper = styled.div`
   background: var(--primary-background-color);
   width: 100%;
   margin: 0 10px;
+  h1 {
+    color: var(--secondary-color-blue);
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
 
   @media (min-width: ${breakpoints.xs}) {
     justify-content: center;
@@ -111,9 +119,35 @@ const Wrapper = styled.div`
   }
 `;
 
-const Email = styled.input``;
+const Form = styled.form`
+  border: 2px groove var(--secondary-color-blue);
+  box-shadow: 10px 5px 5px var(--secondary-color-blue);
+  border-radius: 5px;
+  padding: 20px;
+  @media (min-width: ${breakpoints.xs}) {
+    width: 300px;
+  }
+`;
 
-const Password = styled.input``;
+const Label = styled.label`
+  color: var(--secondary-color-blue);
+  margin: 1px 0;
+  font-weight: bold;
+`;
+
+const Email = styled.input`
+  border: 1px groove var(--secondary-color-blue);
+  outline: none;
+  border-radius: 5px;
+  margin: 1px;
+
+  &:focus {
+    border: 2px groove var(--secondary-color-blue);
+    margin: 0;
+  }
+`;
+
+const Password = styled(Email)``;
 
 const FormStyle = styled.div`
   height: 100%;
@@ -121,6 +155,12 @@ const FormStyle = styled.div`
   flex-direction: column;
 `;
 
-const Message = styled.div``;
+const Message = styled.div`
+  margin: 10px;
+  text-align: center;
+  color: red;
+  font-size: 24px;
+  margin-bottom: 10px;
+`;
 
 export default Login;

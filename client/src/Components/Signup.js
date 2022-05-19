@@ -9,6 +9,9 @@ import React, { useState } from "react";
 import ColorList from "./ColorList";
 
 import { breakpoints } from "./GlobalStyles";
+import { employeeColors } from "./GlobalStyles";
+
+import Button from "./Button";
 
 const Signup = () => {
   const [userInfo, setUserInfo] = useState([]);
@@ -73,6 +76,7 @@ const Signup = () => {
 
   return (
     <Wrapper>
+      <h1>Signup</h1>
       {registrationSuccess ? (
         <RegistrationMessage>
           <h1>{registrationSuccess}</h1>
@@ -80,30 +84,30 @@ const Signup = () => {
           <h1>You will be redirected to the login page</h1>
         </RegistrationMessage>
       ) : (
-        <form onSubmit={(ev) => handleSubmit(ev)}>
+        <Form onSubmit={(ev) => handleSubmit(ev)}>
           <FormStyle>
-            <label>First name : </label>
+            <Label>First name : </Label>
             <FirstName
               onChange={(ev) => handleChange(ev)}
               placeholder={"First name"}
               name={"first-name"}
               required
             />
-            <label>Surname : </label>
+            <Label>Surname : </Label>
             <Surname
               onChange={(ev) => handleChange(ev)}
               placeholder={"surname"}
               name={"surname"}
               required
             />
-            <label>Email : </label>
+            <Label>Email : </Label>
             <Email
               onChange={(ev) => handleChange(ev)}
               placeholder={"Email address"}
               name={"email"}
               required
             />
-            <label>Password : </label>
+            <Label>Password : </Label>
             <Password
               onChange={(ev) => handleChange(ev)}
               type={"password"}
@@ -111,7 +115,7 @@ const Signup = () => {
               name={"password"}
               required
             />
-            <label>Confirm Password : </label>
+            <Label>Confirm Password : </Label>
             <ConfirmPassword
               onChange={(ev) => handleChange(ev)}
               type={"password"}
@@ -119,9 +123,9 @@ const Signup = () => {
               name={"confirm-password"}
               required
             />
+            <Divider />
             <fieldset>
               <legend>Join or create schedule?</legend>
-
               <div>
                 <input
                   onChange={(ev) => {
@@ -139,7 +143,7 @@ const Signup = () => {
                   value={"admin"}
                   required
                 />
-                <label htmlFor={"new-schedule"}>New Schedule?</label>
+                <Label htmlFor={"new-schedule"}>New Schedule?</Label>
               </div>
 
               <div>
@@ -158,12 +162,12 @@ const Signup = () => {
                   name={"access-level"}
                   value={"regular"}
                 />
-                <label htmlFor={"join-schedule"}>Join existing Schedule</label>
+                <Label htmlFor={"join-schedule"}>Join existing Schedule</Label>
               </div>
             </fieldset>
             {userInfo["access-level"] === "regular" && (
               <>
-                <label>Enter the Id of schedule you want to join:</label>
+                <Label>Schedule to join Id:</Label>
                 <input
                   onChange={(ev) => handleChange(ev)}
                   placeholder={"Enter Id"}
@@ -182,16 +186,15 @@ const Signup = () => {
             )}
             {userInfo["access-level"] === "admin" && (
               <>
-                <label>Click to generate your Schedule Id</label>
-                <input
+                <InputButton
                   type={"button"}
                   onClick={(ev) => {
                     ev.target.value = new Date().valueOf();
                     handleChange(ev);
                   }}
                   name={"schedule-id"}
-                  value={"Click to get your id"}
-                  required //stopping here, need to verify collection exist
+                  value={"Click to generate Schedule id"}
+                  required
                 />
                 <h3>{userInfo["schedule-id"]}</h3>
                 {userInfo["schedule-id"] && (
@@ -204,13 +207,14 @@ const Signup = () => {
               </>
             )}
           </FormStyle>
-          <input type={"submit"} value={"Submit"} />
-          <Sample chosenColor={chosenColor}>{userInfo["first-name"]}</Sample>
-        </form>
+          <Divider />
+          <Button type="submit" value="Signup" />
+        </Form>
       )}
       {registrationError && (
         <RegistrationMessage>{registrationError}</RegistrationMessage>
       )}
+      <Sample chosenColor={chosenColor}>{userInfo["first-name"]}</Sample>
     </Wrapper>
   );
 };
@@ -223,6 +227,12 @@ const Wrapper = styled.div`
   background: var(--primary-background-color);
   width: 100%;
   margin: 0 10px;
+  h1 {
+    color: var(--secondary-color-blue);
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
 
   @media (min-width: ${breakpoints.xs}) {
     justify-content: center;
@@ -235,39 +245,78 @@ const Wrapper = styled.div`
   }
 `;
 
-const Email = styled.input``;
+const Label = styled.label`
+  color: var(--secondary-color-blue);
+  margin: 1px 0;
+  font-weight: bold;
+`;
 
-const FirstName = styled.input``;
+const Email = styled.input`
+  border: 1px groove var(--secondary-color-blue);
+  outline: none;
+  border-radius: 5px;
+  margin: 2px;
 
-const Surname = styled.input``;
+  &:focus {
+    border: 2px groove var(--secondary-color-blue);
+    margin: 0;
+  }
+`;
 
-const Password = styled.input``;
+const FirstName = styled(Email)``;
 
-const ConfirmPassword = styled.input``;
+const Surname = styled(Email)``;
+
+const Password = styled(Email)``;
+
+const ConfirmPassword = styled(Email)``;
+
+const InputButton = styled.input`
+  background-color: #21a1fc;
+  color: white;
+  border-radius: 50px;
+  border: none;
+  width: 100%;
+  height: 25px;
+  margin: 5px 0;
+  @media (min-width: ${breakpoints.xs}) {
+  }
+`;
 
 const FormStyle = styled.div`
-  height: 100%;
   display: flex;
   flex-direction: column;
 `;
 
 const RegistrationMessage = styled.div``;
 
-// const ColorList = styled.select`
-//   width: 100%;
-//   height: 100%;
-//   display: initial;
-//   appearance: none;
-//   padding: 5px;
-//   background-color: ${(props) => props.chosenColor};
-//   color: white;
-//   border: none;
-//   font-family: inherit;
-//   outline: none;
-// `;
+const Form = styled.form`
+  border: 2px groove var(--secondary-color-blue);
+  box-shadow: 10px 5px 5px var(--secondary-color-blue);
+  border-radius: 5px;
+  padding: 20px;
+  @media (min-width: ${breakpoints.xs}) {
+    width: 300px;
+  }
+`;
+
+const Divider = styled.div`
+  background-color: var(--secondary-color-blue);
+  width: 100%;
+  height: 1px;
+  margin: 10px 0;
+  box-shadow: 0 0 2px var(--secondary-color-blue);
+  @media (min-width: ${breakpoints.xs}) {
+  }
+`;
 
 const Sample = styled.h2`
-  background-color: ${(props) => props.chosenColor};
+  font-size: 16px;
+  margin-top: 100px;
+  border-radius: 10px;
+  width: 150px;
+  text-align: center;
+  background-color: ${(props) => employeeColors[props.chosenColor]};
 `;
 
 export default Signup;

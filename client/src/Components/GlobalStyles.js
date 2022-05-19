@@ -27,6 +27,7 @@ export default createGlobalStyle`
       --primary-background-color: ${(props) =>
         props.darkMode ? "black" : "#fff5ff"};
       --primary-color: ${(props) => (props.darkMode ? "white" : "black")};
+      --secondary-color-blue: #21a1fc;
     }
 
     html, body, div, span, applet, object, iframe,

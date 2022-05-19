@@ -289,9 +289,9 @@ const Shift = ({
               {firstName}
             </option>
             {status === "ok" ? (
-              <option value={"change"}>Request shift Change?</option>
+              <option value={"change"}>Change?</option>
             ) : (
-              <option value={"ok"}>Cancel request?</option>
+              <option value={"ok"}>Cancel?</option>
             )}
           </Select>
         </Name>
@@ -319,7 +319,7 @@ const Shift = ({
             <option value={"DEFAULT"} disabled>
               {firstName}
             </option>
-            <option value={currentUserName}>Take this shift?</option>
+            <option value={currentUserName}>Accept?</option>
           </Select>
         </Name>
       ) : (

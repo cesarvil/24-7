@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import React, { useState } from "react";
 
-const ActivateAccount = ({ email }) => {
+const ActivateAccount = ({ email, setLoginError }) => {
   const [activationCode, setActivationCode] = useState("");
   const [activationSuccess, setActivationSuccess] = useState("");
   const [codeError, setCodeError] = useState("");
@@ -27,6 +27,7 @@ const ActivateAccount = ({ email }) => {
         } else {
           setActivationSuccess(data.message);
           setCodeError("");
+          setLoginError("");
         }
       })
       .catch((err) => setCodeError(err.message));

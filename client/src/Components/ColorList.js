@@ -53,12 +53,12 @@ const ColorList = ({ handlePickColor, chosenColor, scheduleId }) => {
 };
 
 const Wrapper = styled.select`
+  border-radius: 5px;
   width: 100%;
-  height: 100%;
   display: initial;
   appearance: none;
   padding: 5px;
-  background-color: ${(props) => props.chosenColor};
+  background-color: ${(props) => employeeColors[props.chosenColor]};
   color: white;
   border: none;
   font-family: inherit;
