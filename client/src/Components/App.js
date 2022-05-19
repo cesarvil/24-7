@@ -12,6 +12,7 @@ import React, { useContext } from "react";
 import { CurrentUserContext } from "./CurrentUserContext";
 
 function App() {
+  //to change the colors in styled components and also in header for the icon
   const { darkMode } = useContext(CurrentUserContext);
 
   return (
