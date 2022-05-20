@@ -4,8 +4,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 
-const { sendSchedule } = require("./src/users/helpers/mailer");
-
 const {
   Signup,
   Login,
@@ -30,6 +28,7 @@ const {
   modifyStartOfShift,
   requestChangeOfShift,
   calculateHours,
+  sendSchedule,
 } = require("./handlers");
 
 const PORT = process.env.PORT || 8000;

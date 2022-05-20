@@ -3,7 +3,6 @@ const nodemailer = require("nodemailer");
 
 // async..await is not allowed in global scope, must use a wrapper
 async function sendEmail(receiverEmail, code) {
-  console.log(receiverEmail);
   try {
     // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({
@@ -38,11 +37,8 @@ async function sendEmail(receiverEmail, code) {
     };
   }
 }
-
-async function sendSchedule(req, res) {
-  console.log("email");
-  const receiverEmail = req.params.email;
-  const scheduleId = req.params.scheduleId;
+//email schedule to all users from an specific schedule
+async function emailSchedule(schedule, emails) {
   try {
     // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({
@@ -53,16 +49,54 @@ async function sendSchedule(req, res) {
       },
     });
 
-    // send mail with defined transport object
     let info = await transporter.sendMail({
       from: '"24-7 Scheduler ⌛" <finalproject247_cesarvi247@hotmail.com>', // sender address
-      to: receiverEmail, // list of receivers
+      to: emails, // list of receivers
       subject: `Shedule for ${new Date()}`, // Subject line // format later
-      // text: "Hello world?", // plain text body
       html: `<!DOCTYPE> 
     <html>
       <body>
-        <p>Your SCHEDULE IS : </p> <b>${scheduleId}</b>
+        <p>Schedule</b>
+        ${schedule
+          .map((day) => {
+            return `<table style="border: 1px solid #999;
+            padding: 2px;">
+            <thead>
+              <tr>
+                <th style="border: 1px solid #999;
+            padding: 2px;"> ${day.date.weekday} - ${day.date.dayMonth}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border: 1px solid #999;
+            padding: 2px;">${day.shift1.name}</td>
+                <td style="border: 1px solid #999;
+            padding: 2px;">${day.shift1.start}</td>
+                <td style="border: 1px solid #999;
+            padding: 2px;">${day.shift1.end}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid #999;
+            padding: 2px;">${day.shift2.name}</td>
+                <td style="border: 1px solid #999;
+            padding: 2px;">${day.shift2.start}</td>
+                <td style="border: 1px solid #999;
+            padding: 2px;">${day.shift2.end}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid #999;
+            padding: 2px;">${day.shift3.name}</td>
+                <td style="border: 1px solid #999;
+            padding: 2px;">${day.shift2.start}</td>
+                <td style="border: 1px solid #999;
+            padding: 2px;">${day.shift2.end}</td>
+              </tr>
+            </tbody>
+          </table>`;
+          })
+          .toString()
+          .replaceAll(",", " ")}// removing the commas from the mapped array
       </body>
     </html>`, // html body
     });
@@ -80,4 +114,4 @@ async function sendSchedule(req, res) {
 
 // sendEmail().catch(console.error);
 
-module.exports = { sendEmail, sendSchedule };
+module.exports = { sendEmail, emailSchedule };
