@@ -1,29 +1,53 @@
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import { breakpoints } from "../GlobalStyles";
 import { employeeColors } from "../GlobalStyles";
+import { CurrentUserContext } from "../CurrentUserContext";
 
 const Shift = ({
-  _id,
   firstName,
   scheduleUsers,
   status,
   shiftStart,
   shiftEnd,
   shiftNumber,
-  accessLevel,
-  currentUserName,
   setAllDays,
-  scheduleId,
   allDays,
-  bToken,
   dayIndex,
   day,
   past,
 }) => {
+  const { currentUser } = useContext(CurrentUserContext);
+  const scheduleId = currentUser.schedule.scheduleId;
+  const accessLevel = currentUser.schedule.accessLevel;
+  const currentUserName = currentUser.firstName;
+  const bToken = currentUser.accessToken;
+
   const hours = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-    22, 23, 24,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
   ];
 
   const handleShiftNameChange = (name, _id, shift, shiftName) => {
@@ -45,15 +69,7 @@ const Shift = ({
         return res.json();
       })
       .then((data) => {
-        // setDay({
-        //   ...day,
-        //   [shift]: {
-        //     ...day[shift],
-        //     [shiftName]: data.employeeName, //renaming
-        //     status: data.shiftStatus, //changing status to ok if shift is taken by someone else
-        //   },
-        // });
-        //Had a day state in this component, but had to upstate at the end to be able to check the time on the other day components which have their state in parallel and unknown to each other
+        //Had a day state in this component, but had to uplift the state at the end to be able to check the time on the other day components which have their state in parallel and unknown to each other
         allDays[dayIndex][shift] = {
           ...allDays[dayIndex][shift],
           [shiftName]: data.employeeName,
@@ -83,11 +99,6 @@ const Shift = ({
         return res.json();
       })
       .then((data) => {
-        // setDay({
-        //   ...day,
-        //   [shift]: { ...day[shift], [shiftName]: data.requestedTimeChange },
-        // });
-        //updating requestedTimeChange
         if (data.error) {
           console.log(data.message);
         } else {
@@ -138,10 +149,6 @@ const Shift = ({
         return res.json();
       })
       .then((data) => {
-        // setDay({
-        //   ...day,
-        //   [shift]: { ...day[shift], [shiftName]: data.requestedTimeChange },
-        // });
         if (data.error) {
           console.log(data.message);
         } else {
@@ -174,10 +181,6 @@ const Shift = ({
   };
 
   const handleRequestShiftChange = (requestChange, _id, shift, shiftName) => {
-    // setDay({
-    //   ...day,
-    //   [shift]: { ...day[shift], [shiftName]: requestChange },
-    // });
     fetch("/api/shift-change", {
       method: "POST",
       body: JSON.stringify({
@@ -200,10 +203,7 @@ const Shift = ({
         if (data.error) {
           console.log(data.message);
         }
-        // setDay({
-        //   ...day,
-        //   [shift]: { ...day[shift], [shiftName]: data.requestChange },
-        // });
+
         allDays[dayIndex][shift] = {
           ...allDays[dayIndex][shift],
           [shiftName]: data.requestChange,
@@ -286,7 +286,7 @@ const Shift = ({
             onBlur={(ev) => (ev.target.value = "DEFAULT")}
           >
             <option value={"DEFAULT"} disabled>
-              {firstName}
+              {firstName.charAt(0).toUpperCase() + firstName.slice(1)}
             </option>
             {status === "ok" ? (
               <option value={"change"}>Change?</option>
@@ -317,12 +317,13 @@ const Shift = ({
             onBlur={(ev) => (ev.target.value = "DEFAULT")}
           >
             <option value={"DEFAULT"} disabled>
-              {firstName}
+              {firstName.charAt(0).toUpperCase() + firstName.slice(1)}
             </option>
             <option value={currentUserName}>Accept?</option>
           </Select>
         </Name>
       ) : (
+        // else display the name
         <Name>{firstName.charAt(0).toUpperCase() + firstName.slice(1)}</Name>
       )}
       {/*Start of shift selection*/}

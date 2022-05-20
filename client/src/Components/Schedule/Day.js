@@ -5,12 +5,7 @@ import Shift from "./Shift";
 
 const Days = ({
   _id,
-  accessLevel,
-  currentUserName,
-  scheduleId,
   scheduleUsers,
-  bToken,
-  // dayx,
   setAllDays,
   allDays,
   dayIndex,
@@ -18,21 +13,6 @@ const Days = ({
   today,
 }) => {
   const day = allDays[dayIndex];
-
-  // const [day, setDay] = useState(dayx);
-
-  // useEffect(() => {
-  //   //fetching all days and putting them in state
-  //   const getDay = () => {
-  //     fetch(`api/schedule/${scheduleId}/${_id}`)
-  //       .then((res) => res.json())
-  //       .then((data) => {
-  //         setDay(data.data /*[0]*/);
-  //       })
-  //       .catch((err) => console.log(err));
-  //   };
-  //   getDay();
-  // }, []);
 
   return (
     <Wrapper today={today} _id={_id}>
@@ -47,12 +27,7 @@ const Days = ({
         shiftStart={day.shift1.start}
         shiftEnd={day.shift1.end}
         shiftNumber={"shift1"}
-        accessLevel={accessLevel}
-        currentUserName={currentUserName}
-        _id={_id}
-        scheduleId={scheduleId}
         setAllDays={setAllDays}
-        bToken={bToken}
         allDays={allDays}
         dayIndex={dayIndex}
         day={day}
@@ -65,12 +40,7 @@ const Days = ({
         shiftStart={day.shift2.start}
         shiftEnd={day.shift2.end}
         shiftNumber={"shift2"}
-        accessLevel={accessLevel}
-        currentUserName={currentUserName}
-        _id={_id}
-        scheduleId={scheduleId}
         setAllDays={setAllDays}
-        bToken={bToken}
         allDays={allDays}
         dayIndex={dayIndex}
         day={day}
@@ -83,12 +53,7 @@ const Days = ({
         shiftStart={day.shift3.start}
         shiftEnd={day.shift3.end}
         shiftNumber={"shift3"}
-        accessLevel={accessLevel}
-        currentUserName={currentUserName}
-        _id={_id}
-        scheduleId={scheduleId}
         setAllDays={setAllDays}
-        bToken={bToken}
         allDays={allDays}
         dayIndex={dayIndex}
         day={day}
