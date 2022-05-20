@@ -257,7 +257,10 @@ const Shift = ({
             </option>
             {scheduleUsers.map((user) => {
               return (
-                <option value={user.firstName}>
+                <option
+                  key={`key-${user.firstName}-${day._id}-${shiftNumber}`}
+                  value={user.firstName}
+                >
                   {user.firstName.charAt(0).toUpperCase() +
                     user.firstName.slice(1)}
                 </option>
@@ -349,7 +352,14 @@ const Shift = ({
               {hourToAmPm(shiftStart)}
             </option>
             {hours.map((hour) => {
-              return <option value={hour}>{hourToAmPm(hour)}</option>;
+              return (
+                <option
+                  key={`key-${hour}-${day._id}-${shiftNumber}-start`}
+                  value={hour}
+                >
+                  {hourToAmPm(hour)}
+                </option>
+              );
             })}
           </Select>
         </Hours>
@@ -374,7 +384,14 @@ const Shift = ({
               {hourToAmPm(shiftEnd)}
             </option>
             {hours.map((hour) => {
-              return <option value={hour}>{hourToAmPm(hour)}</option>;
+              return (
+                <option
+                  key={`key-${hour}-${day._id}-${shiftNumber}-end`}
+                  value={hour}
+                >
+                  {hourToAmPm(hour)}
+                </option>
+              );
             })}
           </Select>
         </Hours>

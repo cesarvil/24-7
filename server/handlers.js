@@ -1,6 +1,7 @@
 const { MongoClient, ObjectId } = require("mongodb");
 const { format } = require("date-fns");
 require("dotenv").config();
+const { emailSchedule } = require("./src/users/helpers/mailer");
 const { MONGO_URI } = process.env;
 // const ObjectId = require("mongodb").ObjectId;
 
@@ -22,7 +23,7 @@ const dateToId = (date) => {
 
 const getCurrentBiweekStartingIndex = (allShifts) => {
   //returns null if no shifts
-  //returns -1 if all shifts are in the future
+  //returns -1 if all shifts are in the future(no shifts in the current biweek)
   //returns -2 if all shifts are in the past
   //returns starting index of the current week.
   if (allShifts.length === 0) {
@@ -854,9 +855,52 @@ const createSchedule = async (req, res) => {
   }
 };
 
-// dbFunction("24-7");
-// getLast_Id();
-// modifyShift();
+const sendSchedule = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  const receiverEmail = req.params.email;
+  const scheduleId = req.params.scheduleId;
+  try {
+    await client.connect();
+    const db = client.db("24-7");
+    let emails = [];
+    //returns an array of default colors already in use.
+    let users = await db
+      .collection("users")
+      .find(
+        { "schedule.scheduleId": scheduleId },
+        { projection: { email: 1, _id: 0 } } // if more fields needed add them here or delete the line
+      )
+      .toArray();
+    if (users.length > 0) {
+      emails = users.map((user) => user.email);
+    }
+
+    let schedule = await db.collection(scheduleId).find({}).toArray();
+    if (schedule.length > 0) {
+      let indexToStart = getCurrentBiweekStartingIndex(schedule);
+      if (indexToStart < 0) {
+        return res.status(400).json({ status: 400, message: "No shifts" });
+      } else {
+        schedule.splice(0, indexToStart); //remvoing past shifts
+      }
+      if (schedule.length > 28) {
+        schedule.splice(28); //remvoing past shifts
+      }
+      emailSchedule(schedule, emails);
+    }
+    res.status(200).json({
+      status: 200,
+      success: true,
+      emails: emails,
+    });
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({ status: 500, message: err.message });
+  } finally {
+    client.close();
+  }
+};
 
 //exports all the endpoints
 module.exports = {
@@ -871,4 +915,5 @@ module.exports = {
   modifyStartOfShift,
   requestChangeOfShift,
   calculateHours,
+  sendSchedule,
 };

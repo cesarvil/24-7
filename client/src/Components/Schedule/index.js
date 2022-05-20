@@ -115,9 +115,15 @@ const Schedule = () => {
       <h1>Current Schedule</h1>
       {currentUser && currentUser.schedule.accessLevel === "admin" && (
         <ButtonConttainer>
-          <ButtonSwitch onClick={() => setShowButtons(!showButtons)}>
-            <h1>≡</h1> Admin Menu
-          </ButtonSwitch>
+          {showButtons ? (
+            <ButtonSwitch onClick={() => setShowButtons(!showButtons)}>
+              <h3>X</h3> Admin Menu
+            </ButtonSwitch>
+          ) : (
+            <ButtonSwitch onClick={() => setShowButtons(!showButtons)}>
+              <h2>≡</h2> Admin Menu
+            </ButtonSwitch>
+          )}
           {showButtons && (
             <>
               <Button onClick={() => handleAddWeek()}>Add 2 Weeks</Button>
@@ -139,8 +145,8 @@ const Schedule = () => {
             let weekIndex = index * 14;
             let dayIndex = weekIndex - 1;
             return (
-              <>
-                <Week key={`Week-${index + 1}`}>
+              <div key={`Week-${index + 1}`}>
+                <Week>
                   {
                     //index times 7 to match the index in days.
                     allDays.slice(weekIndex, weekIndex + 7).map((day) => {
@@ -161,7 +167,7 @@ const Schedule = () => {
                   }
                 </Week>
 
-                <Week key={`Week-${index + 2}`}>
+                <Week>
                   {
                     //index times 7 to match the index in days.
                     allDays.slice(weekIndex + 7, weekIndex + 14).map((day) => {
@@ -182,7 +188,7 @@ const Schedule = () => {
                   }
                 </Week>
                 <Divider />
-              </>
+              </div>
             );
           })}
     </Wrapper>
@@ -200,7 +206,11 @@ const Wrapper = styled.div`
 
   @media (min-width: ${breakpoints.xs}) {
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    h1 {
+      text-align: center;
+      width: 100%;
+    }
   }
 
   @media (min-width: ${breakpoints.xl}) {
@@ -251,8 +261,16 @@ const Week = styled.div`
 const Divider = styled.div`
   height: 1px;
   background: gray;
-  margin: 10px 0 15px;
-  width: 98%;
+  margin: 10px 0 15px 50px;
+  width: 80%;
+  @media (min-width: ${breakpoints.xs}) {
+    margin-left: 30px;
+    width: 96%;
+  }
+  @media (min-width: ${breakpoints.xl}) {
+    margin-left: 10px;
+    width: 98%;
+  }
 `;
 
 const Button = styled.button`
@@ -279,12 +297,12 @@ const ButtonSwitch = styled.button`
   border: none;
   font-weight: bold;
   border-radius: 50px;
-  margin: 4px;
-  h1 {
+  margin: 4px 0;
+  h2 {
     font-size: 20px;
   }
   @media (min-width: ${breakpoints.xs}) {
-    margin: 4px 10px;
+    margin: 4px 20px 4px 0;
   }
 `;
 
@@ -294,10 +312,10 @@ const ButtonConttainer = styled.div`
   align-items: center;
   margin: 5px 0;
   flex-wrap: wrap;
+  width: 100%;
   max-width: 368px;
   @media (min-width: ${breakpoints.xs}) {
-    justify-content: flex-start;
-    max-width: 728px;
+    max-width: 1600px;
     margin: 0 0 15px 12px;
   }
 `;
