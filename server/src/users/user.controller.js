@@ -251,7 +251,7 @@ const Activate = async (req, res) => {
           status: 400,
         });
       user.emailToken = "";
-      user.emailTokenExpires = null;
+      user.emailTokenExpires = activationCode;
       user.active = true;
       await user.save();
       return res.status(200).json({

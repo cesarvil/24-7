@@ -97,6 +97,7 @@ const Schedule = () => {
       .catch((err) => console.log(err));
   };
 
+  // stopping here: Next, FILTER USERS BY SCHEDULE ID. THEN EMAIL ALL.
   const handleEmailSchedule = () => {
     const scheduleId = currentUser.schedule.scheduleId;
     // const email = currentUser.email;
@@ -147,12 +148,7 @@ const Schedule = () => {
                       return (
                         <Day
                           key={`Day-${day._id}`}
-                          dayx={day}
                           _id={day._id}
-                          scheduleId={currentUser.schedule.scheduleId}
-                          accessLevel={currentUser.schedule.accessLevel}
-                          currentUserName={currentUser.firstName}
-                          bToken={currentUser.accessToken}
                           scheduleUsers={scheduleUsers}
                           allDays={allDays}
                           setAllDays={setAllDays}
@@ -173,12 +169,7 @@ const Schedule = () => {
                       return (
                         <Day
                           key={`Day-${day._id}`}
-                          dayx={day}
                           _id={day._id}
-                          scheduleId={currentUser.schedule.scheduleId}
-                          accessLevel={currentUser.schedule.accessLevel}
-                          currentUserName={currentUser.firstName}
-                          bToken={currentUser.accessToken}
                           scheduleUsers={scheduleUsers}
                           allDays={allDays}
                           setAllDays={setAllDays}

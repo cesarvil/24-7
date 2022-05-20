@@ -142,8 +142,9 @@ const getSchedule = async (req, res) => {
         error: "getSchedule : No shifts in the currentSchedulebase",
       });
     } else {
-      let todayBiweekStartingIndex =
-        getCurrentBiweekStartingIndex(currentSchedule);
+      let todayBiweekStartingIndex = getCurrentBiweekStartingIndex(
+        currentSchedule
+      );
       // let today = new Date("May 22, 2022 00:00:00"); /*"May 22, 2022 00:00:00"*/
       // let indexToStart = -14;
       // let date1 = currentSchedule[0]._id;

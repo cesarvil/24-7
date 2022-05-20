@@ -7,14 +7,12 @@ import Button from "./Button";
 
 const Login = () => {
   const [userInfo, setUserInfo] = useState([]);
-  const [loginSuccess, setLoginSuccess] = useState("");
   const [loginError, setLoginError] = useState("");
   const activationError = "You must verify your email to activate your account";
-  const { getCurrentUserInfo } = useContext(CurrentUserContext);
+  const { getCurrentUserInfo, currentUser } = useContext(CurrentUserContext);
 
   const handleSubmit = (ev) => {
     //handle loggin
-    setLoginSuccess(false);
     fetch("/api/login", {
       method: "POST",
       body: JSON.stringify({
@@ -31,7 +29,6 @@ const Login = () => {
         if (data.error) {
           setLoginError(data.message);
         } else {
-          setLoginSuccess(data.message);
           setLoginError("");
           localStorage.setItem("btkn", data.accessToken);
           getCurrentUserInfo(data.accessToken);
@@ -52,9 +49,9 @@ const Login = () => {
     // work on loggin and usercontext next
     <Wrapper>
       <h1>Login</h1>
-      {loginSuccess ? (
+      {currentUser !== null && currentUser ? (
         <Message>
-          <h1>{loginSuccess}</h1>
+          <h1>{currentUser.firstName} successfully logged in</h1>
         </Message>
       ) : loginError === activationError ? (
         <div>
