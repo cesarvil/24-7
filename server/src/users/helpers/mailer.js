@@ -38,8 +38,26 @@ async function sendEmail(receiverEmail, code) {
   }
 }
 //email schedule to all users from an specific schedule
-async function emailSchedule(schedule, emails) {
+async function emailSchedule(schedule, emails, colors) {
+  let emailSubject = `Schedule for the week of ${schedule[0].date.weekday} ${
+    schedule[0].date.dayMonth
+  } ${schedule[0]._id.toString().slice(0, 4)}`;
+
   try {
+    const employeeColors = {
+      navy: "#001f3f",
+      blue: "#21a1fc",
+      teal: "#21e2fc",
+      yellow: "#f8fc21",
+      green: "#40bd57",
+      purple: "#e6a8ff",
+      maroon: "#ffa8b8",
+      silver: "#DDDDDD",
+      red: "#FF4136",
+      orange: "#FF851B",
+      white: "#ffffff",
+      black: "#000000",
+    };
     // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({
       service: "hotmail",
@@ -52,53 +70,117 @@ async function emailSchedule(schedule, emails) {
     let info = await transporter.sendMail({
       from: '"24-7 Scheduler ⌛" <finalproject247_cesarvi247@hotmail.com>', // sender address
       to: emails, // list of receivers
-      subject: `Shedule for ${new Date()}`, // Subject line // format later
+      subject: emailSubject, // Subject line // format later
       html: `<!DOCTYPE> 
     <html>
-      <body>
-        <p>Schedule</b>
+      <body >
+        <h1>${emailSubject}</h1>
         ${schedule
           .map((day) => {
-            return `<table style="border: 1px solid #999;
-            padding: 2px;">
+            return `<div><table style="border: 1px solid #999; margin: 10px auto;
+                      padding: 2px; min-width : 300px; color: white; background: black; font-size: 16px">
             <thead>
               <tr>
-                <th style="border: 1px solid #999;
-            padding: 2px;"> ${day.date.weekday} - ${day.date.dayMonth}</th>
+                <th style="border: 1px solid #999;font-weight : bold; min-width : 200px;
+                  padding: 2px;"> ${day.date.weekday} - ${
+              day.date.dayMonth
+            }</th>
+                <th style="min-width : 50px; border: 1px solid #999;">Start</th>
+                <th style="min-width : 50px; border: 1px solid #999;">End</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td style="border: 1px solid #999;
-            padding: 2px;">${day.shift1.name}</td>
-                <td style="border: 1px solid #999;
-            padding: 2px;">${day.shift1.start}</td>
-                <td style="border: 1px solid #999;
-            padding: 2px;">${day.shift1.end}</td>
-              </tr>
-              <tr>
-                <td style="border: 1px solid #999;
-            padding: 2px;">${day.shift2.name}</td>
-                <td style="border: 1px solid #999;
-            padding: 2px;">${day.shift2.start}</td>
-                <td style="border: 1px solid #999;
-            padding: 2px;">${day.shift2.end}</td>
-              </tr>
-              <tr>
-                <td style="border: 1px solid #999;
-            padding: 2px;">${day.shift3.name}</td>
-                <td style="border: 1px solid #999;
-            padding: 2px;">${day.shift2.start}</td>
-                <td style="border: 1px solid #999;
-            padding: 2px;">${day.shift2.end}</td>
-              </tr>
+                <td style= "width : 200px; text-align: center;
+            padding: 2px; background : ${
+              colors.filter((user) => user.name === day.shift1.name).length ===
+              1
+                ? employeeColors[
+                    colors.filter((user) => user.name === day.shift1.name)[0]
+                      .color
+                  ]
+                : "gray"
+            };">${day.shift1.name}</td>
+            <td style="width : 50px; text-align: center;
+            padding: 2px; background : ${
+              colors.filter((user) => user.name === day.shift1.name).length ===
+              1
+                ? employeeColors[
+                    colors.filter((user) => user.name === day.shift1.name)[0]
+                      .color
+                  ]
+                : "gray"
+            };">${day.shift1.start}</td>
+            <td style="width : 50px; text-align: center;
+            padding: 2px; background : ${
+              colors.filter((user) => user.name === day.shift1.name).length ===
+              1
+                ? employeeColors[
+                    colors.filter((user) => user.name === day.shift1.name)[0]
+                      .color
+                  ]
+                : "gray"
+            };">${day.shift1.end}</td>
+            <tr>
+            <td style= "width : 200px; text-align: center;
+        padding: 2px; background : ${
+          colors.filter((user) => user.name === day.shift2.name).length === 1
+            ? employeeColors[
+                colors.filter((user) => user.name === day.shift2.name)[0].color
+              ]
+            : "gray"
+        };">${day.shift2.name}</td>
+        <td style="width : 50px; text-align: center;
+        padding: 2px; background : ${
+          colors.filter((user) => user.name === day.shift2.name).length === 1
+            ? employeeColors[
+                colors.filter((user) => user.name === day.shift2.name)[0].color
+              ]
+            : "gray"
+        };">${day.shift2.start}</td>
+        <td style="width : 50px; text-align: center;
+        padding: 2px; background : ${
+          colors.filter((user) => user.name === day.shift2.name).length === 1
+            ? employeeColors[
+                colors.filter((user) => user.name === day.shift2.name)[0].color
+              ]
+            : "gray"
+        };">${day.shift2.end}</td>
+          </tr>
+          <tr>
+          <td style= "width : 200px; text-align: center;
+      padding: 2px; background : ${
+        colors.filter((user) => user.name === day.shift3.name).length === 1
+          ? employeeColors[
+              colors.filter((user) => user.name === day.shift3.name)[0].color
+            ]
+          : "gray"
+      };">${day.shift3.name}</td>
+      <td style="width : 50px; text-align: center;
+      padding: 2px; background : ${
+        colors.filter((user) => user.name === day.shift3.name).length === 1
+          ? employeeColors[
+              colors.filter((user) => user.name === day.shift3.name)[0].color
+            ]
+          : "gray"
+      };">${day.shift3.start}</td>
+      <td style="width : 50px; text-align: center;
+      padding: 2px; background : ${
+        colors.filter((user) => user.name === day.shift3.name).length === 1
+          ? employeeColors[
+              colors.filter((user) => user.name === day.shift3.name)[0].color
+            ]
+          : "gray"
+      };">${day.shift3.end}</td>
+        </tr>
             </tbody>
-          </table>`;
+          </table></div>`;
           })
           .toString()
-          .replaceAll(",", " ")}// removing the commas from the mapped array
+          .replaceAll(",", " ")}<!--removing the commas from the mapped array-->
+    <p>For more info, please login.</p> 
       </body>
-    </html>`, // html body
+    </html>`,
     });
 
     console.log("Message sent: %s", info.messageId);

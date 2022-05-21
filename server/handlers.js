@@ -863,16 +863,20 @@ const sendSchedule = async (req, res) => {
     await client.connect();
     const db = client.db("24-7");
     let emails = [];
+    let colors = [];
     //returns an array of default colors already in use.
     let users = await db
       .collection("users")
-      .find(
-        { "schedule.scheduleId": scheduleId },
-        { projection: { email: 1, _id: 0 } } // if more fields needed add them here or delete the line
-      )
+      .find({ "schedule.scheduleId": scheduleId })
       .toArray();
     if (users.length > 0) {
       emails = users.map((user) => user.email);
+      colors = users.map((user) => {
+        return {
+          name: user.firstName,
+          color: user.schedule.userColor,
+        };
+      });
     }
 
     let schedule = await db.collection(scheduleId).find({}).toArray();
@@ -886,7 +890,7 @@ const sendSchedule = async (req, res) => {
       if (schedule.length > 28) {
         schedule.splice(28); //remvoing past shifts
       }
-      emailSchedule(schedule, emails);
+      emailSchedule(schedule, emails, colors);
     }
     res.status(200).json({
       status: 200,
