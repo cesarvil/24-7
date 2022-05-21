@@ -3,19 +3,25 @@ import styled from "styled-components";
 import { Link, NavLink } from "react-router-dom";
 import { breakpoints } from "../GlobalStyles";
 import { ImExit, ImCalendar } from "react-icons/im";
-import { MdOutlineHistory, MdAlarmOn } from "react-icons/md";
+import { MdOutlineHistory } from "react-icons/md";
 import { CurrentUserContext } from "../CurrentUserContext";
 import logo from "./24.png"; //https://toppng.com/open-24-hrs-a-day-24-7-icon-PNG-free-PNG-Images_167344
 import logow from "./24white.png"; //https://toppng.com/open-24-hrs-a-day-24-7-icon-PNG-free-PNG-Images_167344
 
 const Header = () => {
-  const { currentUser, setCurrentUser, isMobile, darkMode, setDarkMode } =
-    useContext(CurrentUserContext);
+  const {
+    currentUser,
+    setCurrentUser,
+    isMobile,
+    darkMode,
+    setDarkMode,
+  } = useContext(CurrentUserContext);
 
   useEffect(() => {
     if (currentUser) {
       setDarkMode(currentUser.dark);
     }
+    // eslint-disable-next-line
   }, [currentUser]);
 
   const logout = () => {
@@ -110,7 +116,7 @@ const Wrapper = styled.div`
   font-size: 15px;
   min-width: 380px;
   border-bottom: 1mm #69c0ff ridge;
-  box-shadow: -10px 0 10px #69c0ff, -10px 0 20px #69c0ff, -10px 0 30px #69c0ff;
+  box-shadow: 0px 0 10px #69c0ff, 0 0 20px #69c0ff, 0 0 30px #69c0ff;
 
   @media (min-width: ${breakpoints.xs}) {
     padding: 10px 10px;

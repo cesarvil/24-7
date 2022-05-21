@@ -278,14 +278,15 @@ const Shift = ({
             status={status}
             scheduleUsers={scheduleUsers}
             defaultValue={"DEFAULT"}
-            onChange={(ev) =>
+            onChange={(ev) => {
               handleRequestShiftChange(
                 ev.target.value,
                 day._id,
                 shiftNumber,
                 "status"
-              )
-            }
+              );
+              ev.target.value = "DEFAULT"; //to update the display name else shows change or cancel
+            }}
             onBlur={(ev) => (ev.target.value = "DEFAULT")}
           >
             <option value={"DEFAULT"} disabled>
@@ -309,14 +310,15 @@ const Shift = ({
             firstName={firstName}
             scheduleUsers={scheduleUsers}
             defaultValue={"DEFAULT"}
-            onChange={(ev) =>
+            onChange={(ev) => {
               handleShiftNameChange(
                 ev.target.value,
                 day._id,
                 shiftNumber,
                 "name"
-              )
-            }
+              );
+              ev.target.value = "DEFAULT";
+            }}
             onBlur={(ev) => (ev.target.value = "DEFAULT")}
           >
             <option value={"DEFAULT"} disabled>
