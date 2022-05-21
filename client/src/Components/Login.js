@@ -136,11 +136,10 @@ const Email = styled.input`
   border: 1px groove var(--secondary-color-blue);
   outline: none;
   border-radius: 5px;
-  margin: 1px;
-
+  height: 25px;
   &:focus {
+    margin: -1px 0;
     border: 2px groove var(--secondary-color-blue);
-    margin: 0;
   }
 `;
 

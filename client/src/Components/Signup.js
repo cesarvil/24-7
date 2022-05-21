@@ -255,11 +255,11 @@ const Email = styled.input`
   border: 1px groove var(--secondary-color-blue);
   outline: none;
   border-radius: 5px;
-  margin: 2px;
+  height: 25px;
 
   &:focus {
     border: 2px groove var(--secondary-color-blue);
-    margin: 0;
+    margin: -1px 0;
   }
 `;
 
@@ -277,8 +277,20 @@ const InputButton = styled.input`
   border-radius: 50px;
   border: none;
   width: 100%;
-  height: 25px;
-  margin: 5px 0;
+  height: 30px;
+  margin-top: 20px;
+  border-bottom: 4px #82c8fa solid;
+  border-right: 2px #82c8fa solid;
+
+  &:hover {
+    margin: 19px 0 -1 0;
+  }
+
+  &:active {
+    padding: 0;
+
+    border: none;
+  }
   @media (min-width: ${breakpoints.xs}) {
   }
 `;

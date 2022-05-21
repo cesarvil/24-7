@@ -263,6 +263,7 @@ const Divider = styled.div`
   background: gray;
   margin: 10px 0 15px 50px;
   width: 80%;
+
   @media (min-width: ${breakpoints.xs}) {
     margin-left: 30px;
     width: 96%;
@@ -278,9 +279,20 @@ const Button = styled.button`
   color: white;
   border-radius: 50px;
   border: none;
-  width: 120px;
-  height: 25px;
-  margin: 4px;
+  width: 126px;
+  height: 31px;
+  border-bottom: 4px #82c8fa solid;
+  border-right: 2px #82c8fa solid;
+
+  &:hover {
+    margin: 0 4px -2px 4px;
+  }
+
+  &:active {
+    margin: 0 4px -2px 4px;
+    border: none;
+  }
+
   @media (min-width: ${breakpoints.xs}) {
     margin: 0 4px;
   }
@@ -298,8 +310,24 @@ const ButtonSwitch = styled.button`
   font-weight: bold;
   border-radius: 50px;
   margin: 4px 0;
+  padding: 1px;
+  border-bottom: 4px #82c8fa solid;
+  border-right: 2px #82c8fa solid;
   h2 {
     font-size: 20px;
+  }
+
+  &:hover {
+    padding: 0;
+    height: 26px;
+    width: 120px;
+  }
+
+  &:active {
+    padding: 0;
+    height: 26px;
+    width: 120px;
+    border: none;
   }
   @media (min-width: ${breakpoints.xs}) {
     margin: 4px 20px 4px 0;
@@ -316,7 +344,7 @@ const ButtonConttainer = styled.div`
   max-width: 368px;
   @media (min-width: ${breakpoints.xs}) {
     max-width: 1600px;
-    margin: 0 0 15px 12px;
+    margin: 10px 0 15px 12px;
   }
 `;
 
