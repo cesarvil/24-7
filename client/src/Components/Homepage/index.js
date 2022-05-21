@@ -33,7 +33,6 @@ const Homepage = () => {
       </Content>
       <Divider />
       <Content>
-        {" "}
         <Gif src={regularGif} />
         <p>
           Offer your team the chance to take your shift or take someone's else
