@@ -77,7 +77,7 @@ async function emailSchedule(schedule, emails, colors) {
         <h1>${emailSubject}</h1>
         ${schedule
           .map((day) => {
-            return `<div><table style="border: 1px solid #999; margin: 10px auto;
+            return `<div><table style="border: 1px solid #999; border-radius: 5px; margin: 10px auto;
                       padding: 2px; min-width : 300px; color: white; background: black; font-size: 16px">
             <thead>
               <tr>
