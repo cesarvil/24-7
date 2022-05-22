@@ -38,7 +38,6 @@ const Profile = () => {
     };
 
     if (currentUser) {
-      console.log(currentUser);
       getHours();
     }
   }, [currentUser]);
@@ -134,7 +133,10 @@ const Profile = () => {
                 hoursPerDay.length > 0 &&
                 hoursPerDay.map((user) => {
                   return (
-                    <AdminUsers userColor={user.userColor}>
+                    <AdminUsers
+                      key={`key-${user.username}`}
+                      userColor={user.userColor}
+                    >
                       <AdminFlex>
                         <h1>Name:</h1> <h1>{user.username}</h1>
                       </AdminFlex>

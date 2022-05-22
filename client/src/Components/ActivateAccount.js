@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import React, { useState } from "react";
+import { breakpoints } from "./GlobalStyles";
 
 const ActivateAccount = ({ email, setLoginError }) => {
   const [activationCode, setActivationCode] = useState("");
@@ -56,7 +57,7 @@ const ActivateAccount = ({ email, setLoginError }) => {
               required
             />
           </FormStyle>
-          <input type="submit" value="Submit" />
+          <InputButton type="submit" value="Submit" />
         </form>
       )}
       {codeError && <Message>{codeError}</Message>}
@@ -75,5 +76,29 @@ const FormStyle = styled.div`
 `;
 
 const Message = styled.div``;
+
+const InputButton = styled.input`
+  background-color: #21a1fc;
+  color: white;
+  border-radius: 50px;
+  border: none;
+  width: 100%;
+  height: 30px;
+  margin-top: 20px;
+  border-bottom: 4px #82c8fa solid;
+  border-right: 2px #82c8fa solid;
+
+  &:hover {
+    margin: 19px 0 -1 0;
+  }
+
+  &:active {
+    padding: 0;
+
+    border: none;
+  }
+  @media (min-width: ${breakpoints.xs}) {
+  }
+`;
 
 export default ActivateAccount;

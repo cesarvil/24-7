@@ -146,15 +146,7 @@ const getSchedule = async (req, res) => {
       let todayBiweekStartingIndex = getCurrentBiweekStartingIndex(
         currentSchedule
       );
-      // let today = new Date("May 22, 2022 00:00:00"); /*"May 22, 2022 00:00:00"*/
-      // let indexToStart = -14;
-      // let date1 = currentSchedule[0]._id;
-      // date2 = addSubstractDays(
-      //   idToDate(currentSchedule[currentSchedule.length - 1]._id),
-      //   14
-      // );
       let pastSchedule = [];
-      // date1 = idToDate(date1);
 
       if (todayBiweekStartingIndex === -1) {
         // today before than any shift
@@ -793,6 +785,7 @@ const calculateAdminHours = async (req, res) => {
       CurrentBiweekStartingIndex >= 0
     ) {
       allUserHours = users.map((user) => {
+        // same as calculate hours but mapping throughout all users.
         let hoursPerDay = {
           allTimes: 0,
           thisTwoWeeks: 0,
@@ -847,7 +840,6 @@ const calculateAdminHours = async (req, res) => {
         };
       });
     }
-    console.log(allUserHours);
     res.status(200).json({
       status: 200,
       success: true,

@@ -8,10 +8,10 @@ export const breakpoints = {
 }; //@media only screen and (min-device-width : 768px)
 
 export const employeeColors = {
-  navy: "#001f3f",
+  navy: "#036494",
   blue: "#21a1fc",
   teal: "#21e2fc",
-  yellow: "#f8fc21",
+  yellow: "#aba72c",
   green: "#40bd57",
   purple: "#e6a8ff",
   maroon: "#ffa8b8",
