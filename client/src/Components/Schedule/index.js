@@ -45,7 +45,6 @@ const Schedule = () => {
       fetch(`api/users/${scheduleId}`)
         .then((res) => res.json())
         .then((data) => {
-          console.log(data.usersScheduleProperties);
           setScheduleUsers(data.usersScheduleProperties);
         })
         .catch((err) => console.log(err));
@@ -104,9 +103,7 @@ const Schedule = () => {
     const email = "cezarvillao@gmail.com";
     fetch(`api/email/${scheduleId}/${email}`)
       .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-      })
+      .then((data) => {})
       .catch((err) => console.log(err));
   };
 

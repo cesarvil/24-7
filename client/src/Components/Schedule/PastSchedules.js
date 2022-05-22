@@ -11,8 +11,7 @@ const PastSchedule = () => {
   const [scheduleUsers, setScheduleUsers] = useState(null);
   const { currentUser } = useContext(CurrentUserContext);
   useEffect(() => {
-    console.log("schedule effect");
-    //fetching all days and putting them in state
+    //fetching all days and putting it in state
 
     const getSchedule = () => {
       const scheduleId = currentUser.schedule.scheduleId;
@@ -29,7 +28,6 @@ const PastSchedule = () => {
       fetch(`api/users/${scheduleId}`)
         .then((res) => res.json())
         .then((data) => {
-          console.log(data.usersScheduleProperties);
           setScheduleUsers(data.usersScheduleProperties);
         })
         .catch((err) => console.log(err));
@@ -73,7 +71,7 @@ const PastSchedule = () => {
                         allDays={allDays}
                         setAllDays={setAllDays}
                         dayIndex={dayIndex}
-                        past={true}
+                        past={true} // setting the past here
                       />
                     );
                   })

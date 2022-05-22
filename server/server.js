@@ -28,6 +28,7 @@ const {
   modifyStartOfShift,
   requestChangeOfShift,
   calculateHours,
+  calculateAdminHours,
   sendSchedule,
 } = require("./handlers");
 
@@ -52,6 +53,7 @@ express()
 
   .get("/api/colors/:scheduleId", getUsedColors) // gets colors used
   .get("/api/hours/:scheduleId/:username", calculateHours) // gets hours worked used
+  .get("/api/hours/:scheduleId/", calculateAdminHours) // gets hours worked used
 
   .post("/api/signup", Signup) // sign up user, color is selected here, admin as well
   .post("/api/login", Login) // loggin user, validating session with JWT token, storing it in localstorage for persisting user session
