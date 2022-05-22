@@ -13,7 +13,6 @@ async function validateToken(req, res, next) {
     });
   const token = req.headers.authorization.split(" ")[1]; // Bearer <token>
 
-  console.log("validating");
   try {
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
@@ -31,7 +30,7 @@ async function validateToken(req, res, next) {
       return res.status(403).json(result);
     }
     result = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(result);
+
     if (!user.userId === result.id) {
       result = {
         error: true,
@@ -40,7 +39,6 @@ async function validateToken(req, res, next) {
       return res.status(401).json(result);
     }
     req.decoded = result; // append the result in the "decoded" field of req
-    console.log(result);
     //token validation successful
     next();
   } catch (err) {

@@ -704,32 +704,9 @@ const calculateHours = async (req, res) => {
       allTimes: 0,
       thisTwoWeeks: 0,
       pastTwoWeeks: 0,
-      // thisMonth: 0, //this ones can be retrieved with the ids to date
-      // lastMonth: 0,
-      // thisYear: 0,
-      // lastYear: 0,
     };
     //returns an array of default colors already in use.
-    let hours = await db
-      .collection(scheduleId)
-      .find(
-        {} /*
-        {
-          $or: [
-            { "shift1.name": "peter" },
-            { "shift2.name": "peter" },
-            { "shift3.name": "peter" },
-          ],
-        },
-        {
-          projection: {
-            shift3: { name: 1, start: 1, end: 1 },
-            _id: 0,
-          },
-        }
-      */
-      )
-      .toArray();
+    let hours = await db.collection(scheduleId).find({}).toArray();
     // all hours
 
     let CurrentBiweekStartingIndex = getCurrentBiweekStartingIndex(hours);
@@ -783,6 +760,98 @@ const calculateHours = async (req, res) => {
       status: 200,
       success: true,
       hoursPerDay: hoursPerDay,
+    });
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({ status: 500, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
+const calculateAdminHours = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  const scheduleId = req.params.scheduleId;
+  try {
+    await client.connect();
+    const db = client.db("24-7");
+
+    let allUserHours = [];
+    //returns an array of default colors already in use.
+    let hours = await db.collection(scheduleId).find({}).toArray();
+    let users = await db
+      .collection("users")
+      .find({ "schedule.scheduleId": scheduleId })
+      .toArray();
+
+    let CurrentBiweekStartingIndex = getCurrentBiweekStartingIndex(hours);
+
+    if (
+      hours.length > 0 &&
+      users.length > 0 &&
+      CurrentBiweekStartingIndex >= 0
+    ) {
+      allUserHours = users.map((user) => {
+        let hoursPerDay = {
+          allTimes: 0,
+          thisTwoWeeks: 0,
+          pastTwoWeeks: 0,
+        };
+        let color = user.schedule.userColor;
+        let username = user.firstName;
+        hours.forEach((hour, index) => {
+          let shiftHours = 0; // total hours per day
+          if (hour.shift1.name === username) {
+            if (hour.shift1.start === 24) {
+              shiftHours = shiftHours + hour.shift1.end;
+            } else {
+              shiftHours = shiftHours + hour.shift1.end - hour.shift1.start;
+            }
+          }
+
+          if (hour.shift2.name === username) {
+            shiftHours = shiftHours + hour.shift2.end - hour.shift2.start;
+          }
+
+          if (hour.shift3.name === username) {
+            if (hour.shift3.end < hour.shift3.start) {
+              shiftHours =
+                shiftHours + 24 + hour.shift3.end - hour.shift3.start;
+            } else {
+              shiftHours = shiftHours + hour.shift3.end - hour.shift3.start;
+            }
+          }
+          //all times
+          hoursPerDay.allTimes = hoursPerDay.allTimes + shiftHours;
+          if (
+            //2 current weeks time
+            CurrentBiweekStartingIndex <= index &&
+            CurrentBiweekStartingIndex + 14 > index
+          ) {
+            hoursPerDay.thisTwoWeeks = hoursPerDay.thisTwoWeeks + shiftHours;
+          }
+          if (
+            //2 past 2 weeks time
+            CurrentBiweekStartingIndex - 14 >= 0 &&
+            CurrentBiweekStartingIndex - 14 <= index &&
+            CurrentBiweekStartingIndex > index
+          ) {
+            hoursPerDay.pastTwoWeeks = hoursPerDay.pastTwoWeeks + shiftHours;
+          }
+        });
+        return {
+          username: username,
+          userColor: color,
+          hoursPerDay: hoursPerDay,
+        };
+      });
+    }
+    console.log(allUserHours);
+    res.status(200).json({
+      status: 200,
+      success: true,
+      hoursPerDay: allUserHours,
     });
   } catch (err) {
     console.error(err);
@@ -919,5 +988,6 @@ module.exports = {
   modifyStartOfShift,
   requestChangeOfShift,
   calculateHours,
+  calculateAdminHours,
   sendSchedule,
 };

@@ -288,7 +288,6 @@ const Logout = async (req, res) => {
 const getCurrentUserInfo = async (req, res) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
-    console.log("getCurrentUserInfo");
     mongoose.connect(process.env.MONGO_URI, options);
     let user = await User.findOne({ accessToken: token });
 
