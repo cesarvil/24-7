@@ -1,15 +1,10 @@
   <a href="https://github.com/cesarvil/24-7">
-    <img alt="24-7" title="24-7" src="./client/src/components//header/24white.png" width="50" style="max-width: 100%; margin-right: 10px;" />
+    <img alt="24-7" title="24-7" src="https://user-images.githubusercontent.com/22547579/172258507-a1c5caa4-7c61-4235-b7b7-c74cb5355bde.png" width="50" style="max-width: 100%; margin-right: 10px;" />
   </a> <span style="font-size: 28px;">Scheduler</span>
-
+<!-- ![24white](https://user-images.githubusercontent.com/22547579/172258507-a1c5caa4-7c61-4235-b7b7-c74cb5355bde.png) -->
 <p style="text-align: center;">
     <b>24-7</b> provides simple yet powerful tools to schedule and manage your team in workplaces where someone is required to be working at all times, like a security guard in a building, a gas station clerk, etc. 
 </p>
-
-<!-- <p style="text-align: center;">
-  <b>24-7</b>
-</p> -->
-
 <div style="text-align: center;">
 
 </div>
