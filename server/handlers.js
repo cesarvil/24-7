@@ -12,9 +12,9 @@ const options = {
 
 const dateToId = (date) => {
   //converts a date to date _id
-  var dd = String(date.getDate()).padStart(2, "0"); // padstart used to fill with 0s if the intenger is  <
-  var mm = String(date.getMonth() + 1).padStart(2, "0"); //month 0 to 11
-  var yyyy = date.getFullYear();
+  let dd = String(date.getDate()).padStart(2, "0"); // padstart used to fill with 0s if the intenger is  <
+  let mm = String(date.getMonth() + 1).padStart(2, "0"); //month 0 to 11
+  let yyyy = date.getFullYear();
 
   date = yyyy + mm + dd;
 
@@ -143,9 +143,8 @@ const getSchedule = async (req, res) => {
         error: "getSchedule : No shifts in the currentSchedulebase",
       });
     } else {
-      let todayBiweekStartingIndex = getCurrentBiweekStartingIndex(
-        currentSchedule
-      );
+      let todayBiweekStartingIndex =
+        getCurrentBiweekStartingIndex(currentSchedule);
       let pastSchedule = [];
 
       if (todayBiweekStartingIndex === -1) {
@@ -208,7 +207,8 @@ const deleteAll = async (req, res) => {
   }
 };
 
-const addWeek = async (req, res) => {
+// this function adds empty weeks. test for when there is nothing before, call it in addweek
+const realaddWeek = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
   const scheduleId = req.body.scheduleId;
   // using this unique id to get the date as well.
@@ -289,6 +289,102 @@ const addWeek = async (req, res) => {
       status: 200,
       success: true,
       lastDay_Id: lastDay_Id,
+    });
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({ status: 500, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
+const addWeek = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  const scheduleId = req.body.scheduleId;
+  // using this unique id to get the date as well.
+  let lastDay_Id = await getLast_Id(scheduleId);
+  let firstShifStatus = "ok";
+
+  try {
+    await client.connect();
+    const db = client.db("24-7");
+
+    // to keep track the shift of the last week when adding a new week
+    let allShifts = await db.collection(scheduleId).find({}).toArray();
+
+    if (allShifts.length > 0) {
+      allShifts.splice(0, allShifts.splice(0, allShifts.length - 14));
+
+      //checking if the ending time of the last shift of last week is the same and the start of the first shift of this week
+      if (allShifts[13].shift3.end !== allShifts[0].shift1.start) {
+        firstShifStatus = "error";
+      }
+      lastDay_Id = getNextId(lastDay_Id);
+
+      //very first shift of the first day is a very special case due to past week last shift
+
+      await db.collection(scheduleId).insertOne({
+        _id: lastDay_Id,
+        date: {
+          weekday: format(idToDate(lastDay_Id), "EEEE"),
+          dayMonth: format(idToDate(lastDay_Id), "MMM dd"),
+        },
+        shift1: {
+          name: allShifts[0].shift1.name,
+          start: allShifts[0].shift1.start,
+          end: allShifts[0].shift1.end,
+          status: firstShifStatus, // here the error status check
+        },
+        shift2: {
+          name: allShifts[0].shift2.name,
+          start: allShifts[0].shift2.start,
+          end: allShifts[0].shift2.end,
+          status: "ok",
+        },
+        shift3: {
+          name: allShifts[0].shift3.name,
+          start: allShifts[0].shift3.start,
+          end: allShifts[0].shift3.end,
+          status: "ok",
+        },
+      });
+
+      /////
+      for (let i = 1; i < 14; i++) {
+        lastDay_Id = getNextId(lastDay_Id);
+        await db.collection(scheduleId).insertOne({
+          _id: lastDay_Id,
+          date: {
+            weekday: format(idToDate(lastDay_Id), "EEEE"),
+            dayMonth: format(idToDate(lastDay_Id), "MMM dd"),
+          },
+          shift1: {
+            name: allShifts[i].shift1.name,
+            start: allShifts[i].shift1.start,
+            end: allShifts[i].shift1.end,
+            status: "ok",
+          },
+          shift2: {
+            name: allShifts[i].shift2.name,
+            start: allShifts[i].shift2.start,
+            end: allShifts[i].shift2.end,
+            status: "ok",
+          },
+          shift3: {
+            name: allShifts[i].shift3.name,
+            start: allShifts[i].shift3.start,
+            end: allShifts[i].shift3.end,
+            status: "ok",
+          },
+        });
+      }
+    }
+    res.status(200).json({
+      status: 200,
+      success: true,
+      lastDay_Id: lastDay_Id,
+      firstShifStatus: firstShifStatus,
     });
   } catch (err) {
     console.error(err);
@@ -433,6 +529,21 @@ const modifyStartOfShift = async (req, res) => {
         ) {
           selectionErrorMessage =
             "Shift2: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
+        }
+
+        //single case, prevent that chaning the first shift of the current weeks will modify the past week last shift
+        //HAVENT TESTED THIS. PLEASE CHECK WITH An empty SCHEDULE. also need to readd the function for empty schedule
+        let schedule = await db.collection(scheduleId).find({}).toArray();
+        if (schedule.length > 0) {
+          let indexToStart = getCurrentBiweekStartingIndex(schedule);
+          if (indexToStart < 0) {
+            selectionErrorMessage = "No shifts";
+          } else {
+            if (_id === schedule[indexToStart]._id) {
+              selectionErrorMessage =
+                "Shift1: Can't modify past weeks schedule";
+            }
+          }
         }
       }
     }
