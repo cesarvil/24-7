@@ -24,30 +24,8 @@ const Shift = ({
   const bToken = currentUser.accessToken;
 
   const hours = [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12,
-    13,
-    14,
-    15,
-    16,
-    17,
-    18,
-    19,
-    20,
-    21,
-    22,
-    23,
-    24,
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+    22, 23, 24,
   ];
 
   const handleShiftNameChange = (name, _id, shift, shiftName) => {
@@ -156,7 +134,7 @@ const Shift = ({
             ...allDays[dayIndex][shift],
             [shiftName]: data.requestedTimeChange,
           };
-          //updating start time of next shift
+          //updating end time of previous shift
           let previousShiftEnd = data.previousShiftEnd.split(".")[0];
           if (previousShiftEnd === "shift1") {
             allDays[dayIndex].shift1 = {
@@ -169,10 +147,13 @@ const Shift = ({
               end: data.requestedTimeChange,
             };
           } else if (previousShiftEnd === "shift3") {
-            allDays[dayIndex - 1].shift3 = {
-              ...allDays[dayIndex - 1].shift3,
-              end: data.requestedTimeChange,
-            };
+            if (dayIndex < 0) {
+              // single case where there is a past case. Have to test with empty schedule
+              allDays[dayIndex - 1].shift3 = {
+                ...allDays[dayIndex - 1].shift3,
+                end: data.requestedTimeChange,
+              };
+            }
           }
           setAllDays([...allDays]);
         }
@@ -413,6 +394,8 @@ const Wrapper = styled.div`
     props.scheduleUsers && props.firstName
       ? props.status === "change"
         ? employeeColors.orange
+        : props.status === "error"
+        ? "red"
         : employeeColors[
             props.scheduleUsers.filter(
               (user) => props.firstName === user.firstName

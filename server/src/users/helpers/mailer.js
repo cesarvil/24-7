@@ -4,7 +4,6 @@ const nodemailer = require("nodemailer");
 // async..await is not allowed in global scope, must use a wrapper
 async function sendEmail(receiverEmail, code) {
   try {
-    // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({
       service: "hotmail",
       auth: {
@@ -37,6 +36,7 @@ async function sendEmail(receiverEmail, code) {
     };
   }
 }
+
 //email schedule to all users from an specific schedule
 async function emailSchedule(schedule, emails, colors) {
   let emailSubject = `Schedule for the week of ${schedule[0].date.weekday} ${
@@ -58,7 +58,7 @@ async function emailSchedule(schedule, emails, colors) {
       white: "#ffffff",
       black: "#000000",
     };
-    // create reusable transporter object using the default SMTP transport
+
     let transporter = nodemailer.createTransport({
       service: "hotmail",
       auth: {
