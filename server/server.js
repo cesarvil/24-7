@@ -51,7 +51,10 @@ express()
   // })
   .get("/allow-cors", function (request, response) {
     response.set("Access-Control-Allow-Origin", "*");
-    response.sendFile(__dirname + "/message.json");
+    return res.status(404).json({
+      status: 404,
+      error: "getSchedule : No shifts in the currentSchedulebase",
+    });
   })
   .get("/api/schedule/:scheduleId", getSchedule) // gets all days
   .get("/api/schedule/:scheduleId/:_id", getDay) // gets single day
