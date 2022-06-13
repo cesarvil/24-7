@@ -51,9 +51,9 @@ express()
   // })
   .get("/allow-cors", function (request, response) {
     response.set("Access-Control-Allow-Origin", "*");
-    return res.status(404).json({
-      status: 404,
-      error: "getSchedule : No shifts in the currentSchedulebase",
+    return res.status(200).json({
+      status: 200,
+      message: "getSchedule : No shifts in the currentSchedulebase",
     });
   })
   .get("/api/schedule/:scheduleId", getSchedule) // gets all days
