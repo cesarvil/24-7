@@ -24,8 +24,30 @@ const Shift = ({
   const bToken = currentUser.accessToken;
 
   const hours = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-    22, 23, 24,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
   ];
 
   const handleShiftNameChange = (name, _id, shift, shiftName) => {
@@ -147,8 +169,8 @@ const Shift = ({
               end: data.requestedTimeChange,
             };
           } else if (previousShiftEnd === "shift3") {
-            if (dayIndex < 0) {
-              // single case where there is a past case. Have to test with empty schedule
+            // single case where there is a past schedule. Have to test with empty schedule
+            if (dayIndex > 0) {
               allDays[dayIndex - 1].shift3 = {
                 ...allDays[dayIndex - 1].shift3,
                 end: data.requestedTimeChange,
