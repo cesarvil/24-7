@@ -7,7 +7,6 @@ import { MdDarkMode, MdOutlineDarkMode } from "react-icons/md";
 const Profile = () => {
   const [hoursPerDay, setHoursPerDay] = useState(null);
   const { currentUser, darkMode, setDarkMode } = useContext(CurrentUserContext);
-  let colors;
   useEffect(() => {
     const getHours = () => {
       const accessLevel = currentUser.schedule.accessLevel;
