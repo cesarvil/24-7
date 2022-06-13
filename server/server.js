@@ -50,7 +50,6 @@ express()
   //   next();
   // })
   .get("/allow-cors", function (request, response) {
-    response.set("Access-Control-Allow-Origin", "*");
     return res.status(200).json({
       status: 200,
       message: "getSchedule : No shifts in the currentSchedulebase",
