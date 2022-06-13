@@ -3,7 +3,6 @@ import { breakpoints } from "./GlobalStyles";
 
 export const CurrentUserContext = createContext(null);
 //calling state before fetch and after fetch
-const initialState = {};
 
 export const CurrentUserProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState();
