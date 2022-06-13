@@ -40,21 +40,15 @@ express()
   .use(bodyParser.json())
   .use(express.urlencoded({ extended: false }))
   .use("/", express.static(__dirname + "/"))
-  .use((req, res, next) => {
-    console.log("Time:", Date.now());
+  .use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept"
+    );
     next();
   })
-  // .use(function (req, res, next) {
-  //   res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
-  //   res.header(
-  //     "Access-Control-Allow-Headers",
-  //     "Origin, X-Requested-With, Content-Type, Accept"
-  //   );
-  //   next();
-  // })
-  .get("/api/schedule/:scheduleId", (req, res, next) => {
-    console.log("Time:", Date.now());
-  }) // gets all days
+  .get("/api/schedule/:scheduleId", getSchedule) // gets all days
   .get("/api/schedule/:scheduleId/:_id", getDay) // gets single day
   .get("/api/email/:scheduleId/:email", sendSchedule) //email schedule
   .post("/api/new-week", addWeek) // add a week
