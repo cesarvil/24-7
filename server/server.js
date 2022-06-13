@@ -40,17 +40,18 @@ express()
   .use(bodyParser.json())
   .use(express.urlencoded({ extended: false }))
   .use("/", express.static(__dirname + "/"))
-  .use(function (req, res, next) {
-    console.log("Test");
-    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
-    res.header(
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    next();
-  })
-  .get("/api/xx/", (req, res) => {
-    console.log("Time:", Date.now());
+  // .use(function (req, res, next) {
+  //   console.log("Test");
+  //   res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+  //   res.header(
+  //     "Access-Control-Allow-Headers",
+  //     "Origin, X-Requested-With, Content-Type, Accept"
+  //   );
+  //   next();
+  // })
+  .get("/allow-cors", function (request, response) {
+    response.set("Access-Control-Allow-Origin", "*");
+    response.sendFile(__dirname + "/message.json");
   })
   .get("/api/schedule/:scheduleId", getSchedule) // gets all days
   .get("/api/schedule/:scheduleId/:_id", getDay) // gets single day
