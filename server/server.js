@@ -40,7 +40,6 @@ express()
   .use(bodyParser.json())
   .use(express.urlencoded({ extended: false }))
   .use("/", express.static(__dirname + "/"))
-
   .get("/api/schedule/:scheduleId", getSchedule) // gets all days
   .get("/api/schedule/:scheduleId/:_id", getDay) // gets single day
   .get("/api/email/:scheduleId/:email", sendSchedule) //email schedule

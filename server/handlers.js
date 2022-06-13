@@ -12,7 +12,7 @@ const options = {
 
 const dateToId = (date) => {
   //converts a date to date _id
-  let dd = String(date.getDate()).padStart(2, "0"); // padstart used to fill with 0s if the intenger is  <
+  let dd = String(date.getDate()).padStart(2, "0"); // padstart used to fill with 0s if the intenger is  < 10
   let mm = String(date.getMonth() + 1).padStart(2, "0"); //month 0 to 11
   let yyyy = date.getFullYear();
 
@@ -143,8 +143,9 @@ const getSchedule = async (req, res) => {
         error: "getSchedule : No shifts in the currentSchedulebase",
       });
     } else {
-      let todayBiweekStartingIndex =
-        getCurrentBiweekStartingIndex(currentSchedule);
+      let todayBiweekStartingIndex = getCurrentBiweekStartingIndex(
+        currentSchedule
+      );
       let pastSchedule = [];
 
       if (todayBiweekStartingIndex === -1) {
@@ -379,6 +380,73 @@ const addWeek = async (req, res) => {
           },
         });
       }
+    } else {
+      // this else will add 2 empty weeks if there is no weeks to copy.
+      let lastDayShift = await db
+        .collection(scheduleId)
+        .findOne({ _id: lastDay_Id });
+
+      if (lastDayShift !== null) {
+        lastDayShift = lastDayShift.shift3.end;
+      }
+      /////
+      for (let i = 0; i < 14; i++) {
+        lastDay_Id = getNextId(lastDay_Id); //changing id while following date rules.
+        if (i === 0 && lastDayShift !== null) {
+          // if previous week exist, next week first shift is the same as of the last shift
+          await db.collection(scheduleId).insertOne({
+            _id: lastDay_Id,
+            date: {
+              weekday: format(idToDate(lastDay_Id), "EEEE"),
+              dayMonth: format(idToDate(lastDay_Id), "MMM dd"),
+            },
+            shift1: {
+              name: "",
+              start: lastDayShift,
+              end: 14,
+              status: "ok",
+            },
+            shift2: {
+              name: "",
+              start: 14,
+              end: 16,
+              status: "ok",
+            },
+            shift3: {
+              name: "",
+              start: 16,
+              end: 24,
+              status: "ok",
+            },
+          });
+        } else {
+          await db.collection(scheduleId).insertOne({
+            _id: lastDay_Id,
+            date: {
+              weekday: format(idToDate(lastDay_Id), "EEEE"),
+              dayMonth: format(idToDate(lastDay_Id), "MMM dd"),
+            },
+            shift1: {
+              name: "",
+              start: 24,
+              end: 8,
+              status: "ok",
+            },
+            shift2: {
+              name: "",
+              start: 8,
+              end: 16,
+              status: "ok",
+            },
+            shift3: {
+              name: "",
+              start: 16,
+              end: 24,
+              status: "ok",
+            },
+          });
+        }
+      }
     }
     res.status(200).json({
       status: 200,
@@ -459,7 +527,7 @@ const modifyStartOfShift = async (req, res) => {
         if (currentDay.shift3.end + 24 - requestedTimeChange > 14) {
           //checking the current shift wont go over 14hours
           selectionErrorMessage =
-            "xShift3: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
+            "Shift3: Invalid time selection. Minimun shift time is 1hour and max is 14hours";
         } else if (
           requestedTimeChange <= currentDay.shift2.start ||
           requestedTimeChange - currentDay.shift2.start > 14
@@ -534,7 +602,8 @@ const modifyStartOfShift = async (req, res) => {
         //single case, prevent that chaning the first shift of the current weeks will modify the past week last shift
         //HAVENT TESTED THIS. PLEASE CHECK WITH An empty SCHEDULE. also need to readd the function for empty schedule
         let schedule = await db.collection(scheduleId).find({}).toArray();
-        if (schedule.length > 0) {
+        if (schedule.length > 14) {
+          // 14 means there is only the current or past schedule. if thats the case we can modify the first shift start time.
           let indexToStart = getCurrentBiweekStartingIndex(schedule);
           if (indexToStart < 0) {
             selectionErrorMessage = "No shifts";
