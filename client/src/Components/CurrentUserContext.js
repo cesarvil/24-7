@@ -31,7 +31,7 @@ export const CurrentUserProvider = ({ children }) => {
 
   const getCurrentUserInfo = (bToken) => {
     //handle loggin
-    fetch("/api/user-info", {
+    fetch("https://scheduler24-7.herokuapp.com/api/user-info", {
       method: "GET",
       headers: {
         authorization: `bearer ${bToken}`,
@@ -48,7 +48,7 @@ export const CurrentUserProvider = ({ children }) => {
           setDarkMode(data.user.dark);
         }
       })
-      .catch((err) => alert("context error") /*setLoginError(err.message)*/);
+      .catch((err) => alert(err) /*setLoginError(err.message)*/);
   };
 
   return (
