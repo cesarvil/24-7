@@ -207,7 +207,7 @@ const Login = async (req, res) => {
     await user.save();
 
     //Success
-    return res.send({
+    return res.status(200).json({
       success: true,
       message: "User logged in successfully",
       accessToken: token, //Send it to the client
