@@ -296,7 +296,7 @@ const noCodeActivate = async (req, res) => {
           status: 400,
         });
       user.emailToken = "";
-      user.emailTokenExpires = activationCode;
+      user.emailTokenExpires = "";
       user.active = true;
       await user.save();
       return res.status(200).json({
