@@ -10,7 +10,7 @@ const ActivateAccount = ({ email, setLoginError }) => {
   const handleSubmit = (ev) => {
     //handle activate account
     setActivationSuccess(false);
-    fetch("/api/activation", {
+    fetch("https://scheduler24-7.herokuapp.com/api/activation", {
       method: "PATCH",
       body: JSON.stringify({
         email: email,

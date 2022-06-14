@@ -15,7 +15,7 @@ const PastSchedule = () => {
 
     const getSchedule = () => {
       const scheduleId = currentUser.schedule.scheduleId;
-      fetch(`api/schedule/${scheduleId}`)
+      fetch(`https://scheduler24-7.herokuapp.com/api/schedule/${scheduleId}`)
         .then((res) => res.json())
         .then((data) => {
           setAllDays(data.pastSchedule);
@@ -25,7 +25,7 @@ const PastSchedule = () => {
 
     const getUsersInSchedule = () => {
       let scheduleId = currentUser.schedule.scheduleId;
-      fetch(`api/users/${scheduleId}`)
+      fetch(`https://scheduler24-7.herokuapp.com/api/users/${scheduleId}`)
         .then((res) => res.json())
         .then((data) => {
           setScheduleUsers(data.usersScheduleProperties);
