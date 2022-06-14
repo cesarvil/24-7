@@ -1,8 +1,10 @@
 "use strict";
 const nodemailer = require("nodemailer");
 const { NODEMAIL, NODEMAILERPASSWORD } = process.env;
+
 const transporter = nodemailer.createTransport({
-  service: "zohomail",
+  host: "smtp.zoho.com",
+  secure: true,
   auth: {
     user: NODEMAIL,
     pass: NODEMAILERPASSWORD,
@@ -14,7 +16,7 @@ async function sendEmail(receiverEmail, code) {
   try {
     // send mail with defined transport object
     let info = await transporter.sendMail({
-      from: '"24-7 Scheduler ⌛" <finalproject247_cesarvi247@hotmail.com>', // sender address
+      from: `"24-7 Scheduler ⌛" <${NODEMAIL}>`, // sender address
       to: receiverEmail, // list of receivers
       subject: `Shedule for ${new Date()}`, // Subject line // format later
       // text: "Hello world?", // plain text body
