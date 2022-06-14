@@ -241,7 +241,52 @@ const Activate = async (req, res) => {
     if (!user) {
       return res.status(400).json({
         error: true,
-        message: "Invalid details",
+        message: "Invalid or expired token",
+      });
+    } else {
+      if (user.active)
+        return res.send({
+          error: true,
+          message: "Account already activated",
+          status: 400,
+        });
+      user.emailToken = "";
+      user.emailTokenExpires = activationCode;
+      user.active = true;
+      await user.save();
+      return res.status(200).json({
+        success: true,
+        message: "Account activated.",
+      });
+    }
+  } catch (error) {
+    console.error("activation-error", error);
+    return res.status(500).json({
+      error: true,
+      message: error.message,
+    });
+  }
+};
+
+const noCodeActivate = async (req, res) => {
+  try {
+    mongoose.connect(process.env.MONGO_URI, options);
+    const { email } = req.body;
+    if (!email) {
+      return res.json({
+        error: true,
+        status: 400,
+        message: "Missing email",
+      });
+    }
+    const user = await User.findOne({
+      email: email,
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "No email address found",
       });
     } else {
       if (user.active)
@@ -375,6 +420,7 @@ module.exports = {
   Signup,
   Login,
   Activate,
+  noCodeActivate,
   Logout,
   getCurrentUserInfo,
   usersInScheduleId,

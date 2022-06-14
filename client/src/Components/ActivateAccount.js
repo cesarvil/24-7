@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import React, { useState } from "react";
 import { breakpoints } from "./GlobalStyles";
+import Button from "./Button";
 
 const ActivateAccount = ({ email, setLoginError }) => {
   const [activationCode, setActivationCode] = useState("");
@@ -15,6 +16,35 @@ const ActivateAccount = ({ email, setLoginError }) => {
       body: JSON.stringify({
         email: email,
         activationCode: activationCode,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          setCodeError(data.message);
+        } else {
+          setActivationSuccess(data.message);
+          setCodeError("");
+          setLoginError("");
+        }
+      })
+      .catch((err) => setCodeError(err.message));
+
+    ev.preventDefault();
+  };
+
+  const handleSkipActivation = (ev) => {
+    //handle activate account
+    setActivationSuccess(false);
+    console.log(email);
+    fetch("https://scheduler24-7.herokuapp.com/api/skip-activation", {
+      method: "PATCH",
+      body: JSON.stringify({
+        email: email,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -60,7 +90,19 @@ const ActivateAccount = ({ email, setLoginError }) => {
           <InputButton type="submit" value="Submit" />
         </form>
       )}
-      {codeError && <Message>{codeError}</Message>}
+      {codeError && (
+        <div>
+          <Message>
+            {codeError}. If you are testing my app and want to skip the
+            activation code input, just click on the skip button to activate
+            your account.
+          </Message>
+          <Button
+            onClick={(ev) => handleSkipActivation(ev)}
+            value={"Skip Activation"}
+          />
+        </div>
+      )}
     </Wrapper>
   );
 };

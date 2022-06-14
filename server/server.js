@@ -9,6 +9,7 @@ const {
   Signup,
   Login,
   Activate,
+  noCodeActivate,
   Logout,
   getCurrentUserInfo,
   usersInScheduleId,
@@ -59,6 +60,7 @@ express()
   .post("/api/signup", Signup) // sign up user, color is selected here, admin as well
   .post("/api/login", Login) // loggin user, validating session with JWT token, storing it in localstorage for persisting user session
   .patch("/api/activation", Activate) // activate email acount with code
+  .patch("/api/skip-activation")
   .get("/api/users/:scheduleId", usersInScheduleId) // get all users belonging to 1 schedule
   .get("/api/user-info", validateToken, getCurrentUserInfo) //validate token is a middleware,
 
