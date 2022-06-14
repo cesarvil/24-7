@@ -13,7 +13,8 @@ const Login = () => {
 
   const handleSubmit = (ev) => {
     //handle loggin
-    fetch("/api/login", {
+    fetch("https://scheduler24-7.herokuapp.com/api/login", {
+      mode: "cors",
       method: "POST",
       body: JSON.stringify({
         email: userInfo.email.toLowerCase(),
