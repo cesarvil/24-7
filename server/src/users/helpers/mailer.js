@@ -70,7 +70,7 @@ async function emailSchedule(schedule, emails, colors) {
     // });
 
     let info = await transporter.sendMail({
-      from: '"24-7 Scheduler ⌛" <finalproject247_cesarvi247@hotmail.com>', // sender address
+      from: `"24-7 Scheduler ⌛" <${NODEMAIL}>`, // sender address
       to: emails, // list of receivers
       subject: emailSubject, // Subject line // format later
       html: `<!DOCTYPE> 
