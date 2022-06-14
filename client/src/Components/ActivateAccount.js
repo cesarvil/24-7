@@ -36,6 +36,34 @@ const ActivateAccount = ({ email, setLoginError }) => {
     ev.preventDefault();
   };
 
+  const handleSkipActivation = (ev) => {
+    setActivationSuccess(false);
+    console.log(email);
+    fetch("https://scheduler24-7.herokuapp.com/api/skip-activation", {
+      method: "PATCH",
+      body: JSON.stringify({
+        email: email,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          setCodeError(data.message);
+        } else {
+          setActivationSuccess(data.message);
+          setCodeError("");
+          setLoginError("");
+        }
+      })
+      .catch((err) => setCodeError(err.message));
+
+    ev.preventDefault();
+  };
+
   const handleChange = (ev) => {
     setActivationCode(ev.target.value);
   };
@@ -60,12 +88,25 @@ const ActivateAccount = ({ email, setLoginError }) => {
           <InputButton type="submit" value="Submit" />
         </form>
       )}
-      {codeError && <Message>{codeError}</Message>}
+      {codeError && (
+        <div>
+          <Message>
+            {codeError}. If you are testing my app and want to skip the
+            activation code input, just click on the skip button to activate
+            your account.
+          </Message>
+          <Button onClick={(ev) => handleSkipActivation(ev)}>
+            Skip Activation
+          </Button>
+        </div>
+      )}
     </Wrapper>
   );
 };
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  width: 400px;
+`;
 
 const AccessToken = styled.input``;
 
@@ -78,6 +119,30 @@ const FormStyle = styled.div`
 const Message = styled.div``;
 
 const InputButton = styled.input`
+  background-color: #21a1fc;
+  color: white;
+  border-radius: 50px;
+  border: none;
+  width: 100%;
+  height: 30px;
+  margin-top: 20px;
+  border-bottom: 4px #82c8fa solid;
+  border-right: 2px #82c8fa solid;
+
+  &:hover {
+    margin: 19px 0 -1 0;
+  }
+
+  &:active {
+    padding: 0;
+
+    border: none;
+  }
+  @media (min-width: ${breakpoints.xs}) {
+  }
+`;
+
+const Button = styled.button`
   background-color: #21a1fc;
   color: white;
   border-radius: 50px;

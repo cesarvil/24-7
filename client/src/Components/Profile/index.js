@@ -294,6 +294,9 @@ const AdminUsersContainer = styled.div`
   margin: 25px 0;
 
   @media (min-width: ${breakpoints.xs}) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
     margin: 28px 0;
     h1 {
       padding-left: 2px;

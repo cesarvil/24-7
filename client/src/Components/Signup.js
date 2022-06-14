@@ -22,7 +22,6 @@ const Signup = () => {
 
   const handleSubmit = (ev) => {
     //handle signup
-    console.log(userInfo);
     setRegistrationSuccess(false);
     fetch("https://scheduler24-7.herokuapp.com/api/signup", {
       method: "POST",
@@ -208,13 +207,13 @@ const Signup = () => {
             )}
           </FormStyle>
           <Divider />
+          <Sample chosenColor={chosenColor}>{userInfo["first-name"]}</Sample>
           <Button type="submit" value="Signup" />
         </Form>
       )}
       {registrationError && (
         <RegistrationMessage>{registrationError}</RegistrationMessage>
       )}
-      <Sample chosenColor={chosenColor}>{userInfo["first-name"]}</Sample>
     </Wrapper>
   );
 };
@@ -300,7 +299,10 @@ const FormStyle = styled.div`
   flex-direction: column;
 `;
 
-const RegistrationMessage = styled.div``;
+const RegistrationMessage = styled.div`
+  margin-top: 10px;
+  color: red;
+`;
 
 const Form = styled.form`
   border: 2px groove var(--secondary-color-blue);
@@ -324,9 +326,10 @@ const Divider = styled.div`
 
 const Sample = styled.h2`
   font-size: 16px;
-  margin-top: 100px;
+  margin: auto;
+  margin-top: 20px;
   border-radius: 10px;
-  width: 150px;
+  width: 60%;
   text-align: center;
   background-color: ${(props) => employeeColors[props.chosenColor]};
 `;

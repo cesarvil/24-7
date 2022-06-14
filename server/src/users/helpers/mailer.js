@@ -1,20 +1,22 @@
 "use strict";
 const nodemailer = require("nodemailer");
+const { NODEMAIL, NODEMAILERPASSWORD } = process.env;
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.zoho.com",
+  secure: true,
+  auth: {
+    user: NODEMAIL,
+    pass: NODEMAILERPASSWORD,
+  },
+});
 
 // async..await is not allowed in global scope, must use a wrapper
 async function sendEmail(receiverEmail, code) {
   try {
-    let transporter = nodemailer.createTransport({
-      service: "hotmail",
-      auth: {
-        user: "finalproject247_cesarvi247@hotmail.com", // generated ethereal user
-        pass: "nodemailer247", // generated ethereal password
-      },
-    });
-
     // send mail with defined transport object
     let info = await transporter.sendMail({
-      from: '"24-7 Scheduler ⌛" <finalproject247_cesarvi247@hotmail.com>', // sender address
+      from: `"24-7 Scheduler ⌛" <${NODEMAIL}>`, // sender address
       to: receiverEmail, // list of receivers
       subject: `Shedule for ${new Date()}`, // Subject line // format later
       // text: "Hello world?", // plain text body
@@ -59,16 +61,16 @@ async function emailSchedule(schedule, emails, colors) {
       black: "#000000",
     };
 
-    let transporter = nodemailer.createTransport({
-      service: "hotmail",
-      auth: {
-        user: "finalproject247_cesarvi247@hotmail.com", // generated ethereal user
-        pass: "nodemailer247", // generated ethereal password
-      },
-    });
+    // let transporter = nodemailer.createTransport({
+    //   service: "hotmail",
+    //   auth: {
+    //     user: "finalproject247_cesarvi247@hotmail.com", // generated ethereal user
+    //     pass: "nodemailer247", // generated ethereal password
+    //   },
+    // });
 
     let info = await transporter.sendMail({
-      from: '"24-7 Scheduler ⌛" <finalproject247_cesarvi247@hotmail.com>', // sender address
+      from: `"24-7 Scheduler ⌛" <${NODEMAIL}>`, // sender address
       to: emails, // list of receivers
       subject: emailSubject, // Subject line // format later
       html: `<!DOCTYPE> 
