@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import React, { useState } from "react";
 import { breakpoints } from "./GlobalStyles";
-import Button from "./Button";
 
 const ActivateAccount = ({ email, setLoginError }) => {
   const [activationCode, setActivationCode] = useState("");
@@ -38,7 +37,6 @@ const ActivateAccount = ({ email, setLoginError }) => {
   };
 
   const handleSkipActivation = (ev) => {
-    //handle activate account
     setActivationSuccess(false);
     console.log(email);
     fetch("https://scheduler24-7.herokuapp.com/api/skip-activation", {
@@ -97,17 +95,18 @@ const ActivateAccount = ({ email, setLoginError }) => {
             activation code input, just click on the skip button to activate
             your account.
           </Message>
-          <Button
-            onClick={(ev) => handleSkipActivation(ev)}
-            value={"Skip Activation"}
-          />
+          <Button onClick={(ev) => handleSkipActivation(ev)}>
+            Skip Activation
+          </Button>
         </div>
       )}
     </Wrapper>
   );
 };
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  width: 400px;
+`;
 
 const AccessToken = styled.input``;
 
@@ -120,6 +119,30 @@ const FormStyle = styled.div`
 const Message = styled.div``;
 
 const InputButton = styled.input`
+  background-color: #21a1fc;
+  color: white;
+  border-radius: 50px;
+  border: none;
+  width: 100%;
+  height: 30px;
+  margin-top: 20px;
+  border-bottom: 4px #82c8fa solid;
+  border-right: 2px #82c8fa solid;
+
+  &:hover {
+    margin: 19px 0 -1 0;
+  }
+
+  &:active {
+    padding: 0;
+
+    border: none;
+  }
+  @media (min-width: ${breakpoints.xs}) {
+  }
+`;
+
+const Button = styled.button`
   background-color: #21a1fc;
   color: white;
   border-radius: 50px;
