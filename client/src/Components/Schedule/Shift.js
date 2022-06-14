@@ -51,7 +51,7 @@ const Shift = ({
   ];
 
   const handleShiftNameChange = (name, _id, shift, shiftName) => {
-    fetch("/api/shift-name", {
+    fetch("https://scheduler24-7.herokuapp.com/api/shift-name", {
       method: "POST",
       body: JSON.stringify({
         name: name,
@@ -81,7 +81,7 @@ const Shift = ({
   };
 
   const handleUpdateEndTime = (time, _id, shift, shiftName) => {
-    fetch("/api/shift-end", {
+    fetch("https://scheduler24-7.herokuapp.com/api/shift-end", {
       method: "POST",
       body: JSON.stringify({
         time: Number(time), // select/options return string and need number so casting
@@ -131,7 +131,7 @@ const Shift = ({
   };
 
   const handleUpdateStartTime = (time, _id, shift, shiftName) => {
-    fetch("/api/shift-start", {
+    fetch("https://scheduler24-7.herokuapp.com/api/shift-start", {
       method: "POST",
       body: JSON.stringify({
         time: Number(time),
@@ -184,7 +184,7 @@ const Shift = ({
   };
 
   const handleRequestShiftChange = (requestChange, _id, shift, shiftName) => {
-    fetch("/api/shift-change", {
+    fetch("https://scheduler24-7.herokuapp.com/api/shift-change", {
       method: "POST",
       body: JSON.stringify({
         requestChange: requestChange,

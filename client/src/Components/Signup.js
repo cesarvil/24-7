@@ -24,7 +24,7 @@ const Signup = () => {
     //handle signup
     console.log(userInfo);
     setRegistrationSuccess(false);
-    fetch("/api/signup", {
+    fetch("https://scheduler24-7.herokuapp.com/api/signup", {
       method: "POST",
       body: JSON.stringify({
         email: userInfo.email.toLowerCase(),

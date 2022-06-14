@@ -14,7 +14,9 @@ const Profile = () => {
       const username = currentUser.firstName;
 
       if (accessLevel === "regular") {
-        fetch(`api/hours/${scheduleId}/${username}`)
+        fetch(
+          `https://scheduler24-7.herokuapp.com/api/hours/${scheduleId}/${username}`
+        )
           .then((res) => res.json())
           .then((data) => {
             if (data.error) {
@@ -24,7 +26,7 @@ const Profile = () => {
           })
           .catch((err) => console.log(err));
       } else if (accessLevel === "admin") {
-        fetch(`api/hours/${scheduleId}/`)
+        fetch(`https://scheduler24-7.herokuapp.com/api/hours/${scheduleId}/`)
           .then((res) => res.json())
           .then((data) => {
             if (data.error) {
@@ -43,7 +45,7 @@ const Profile = () => {
 
   const handleDarkMode = (ev) => {
     setDarkMode(!darkMode); // optimistic rendering
-    fetch("/api/dark", {
+    fetch("https://scheduler24-7.herokuapp.com//api/dark", {
       method: "PATCH",
       body: JSON.stringify({
         email: currentUser.email,
