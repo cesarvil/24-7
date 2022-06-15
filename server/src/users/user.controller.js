@@ -6,6 +6,7 @@ const { generateJwt } = require("./helpers/generateJwt");
 const User = require("./user.model");
 const mongoose = require("mongoose");
 const { createSchedule } = require("../../handlers");
+const { MONGO_URI } = process.env;
 
 const options = {
   useNewUrlParser: true,
@@ -63,7 +64,7 @@ const userSchema = Joi.object().keys({
 
 const Signup = async (req, res) => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, options);
+    await mongoose.connect(MONGO_URI, options);
     //validation
     const result = userSchema.validate(req.body);
     if (result.error) {
@@ -161,7 +162,7 @@ const Signup = async (req, res) => {
 
 const Login = async (req, res) => {
   try {
-    mongoose.connect(process.env.MONGO_URI, options);
+    mongoose.connect(MONGO_URI, options);
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({
@@ -223,7 +224,7 @@ const Login = async (req, res) => {
 
 const Activate = async (req, res) => {
   try {
-    mongoose.connect(process.env.MONGO_URI, options);
+    mongoose.connect(MONGO_URI, options);
     const { email, activationCode } = req.body;
     if (!email || !activationCode) {
       return res.json({
@@ -270,7 +271,7 @@ const Activate = async (req, res) => {
 
 const noCodeActivate = async (req, res) => {
   try {
-    mongoose.connect(process.env.MONGO_URI, options);
+    mongoose.connect(MONGO_URI, options);
     const { email } = req.body;
     if (!email) {
       return res.json({
@@ -315,7 +316,7 @@ const noCodeActivate = async (req, res) => {
 
 const Logout = async (req, res) => {
   try {
-    mongoose.connect(process.env.MONGO_URI, options);
+    mongoose.connect(MONGO_URI, options);
     const { id } = req.decoded; //retreiving the id from the middleware result
     let user = await User.findOne({ userId: id });
     user.accessToken = "";
@@ -333,7 +334,7 @@ const Logout = async (req, res) => {
 const getCurrentUserInfo = async (req, res) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
-    mongoose.connect(process.env.MONGO_URI, options);
+    mongoose.connect(MONGO_URI, options);
     let user = await User.findOne({ accessToken: token });
 
     return res.send({ success: true, message: "User info", user: user });
@@ -350,7 +351,7 @@ const getCurrentUserInfo = async (req, res) => {
 const usersInScheduleId = async (req, res) => {
   const scheduleId = req.params.scheduleId;
   try {
-    mongoose.connect(process.env.MONGO_URI, options);
+    mongoose.connect(MONGO_URI, options);
     let users = await User.find({
       "schedule.scheduleId": scheduleId,
     });
@@ -382,7 +383,7 @@ const usersInScheduleId = async (req, res) => {
 
 const ToggleDarkMode = async (req, res) => {
   try {
-    mongoose.connect(process.env.MONGO_URI, options);
+    mongoose.connect(MONGO_URI, options);
     const { email, darkMode } = req.body;
     if (!email) {
       return res.json({

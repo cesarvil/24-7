@@ -45,7 +45,7 @@ const Profile = () => {
 
   const handleDarkMode = (ev) => {
     setDarkMode(!darkMode); // optimistic rendering
-    fetch("https://scheduler24-7.herokuapp.com//api/dark", {
+    fetch("https://scheduler24-7.herokuapp.com/api/dark", {
       method: "PATCH",
       body: JSON.stringify({
         email: currentUser.email,
