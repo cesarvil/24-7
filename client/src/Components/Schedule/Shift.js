@@ -24,30 +24,8 @@ const Shift = ({
   const bToken = currentUser.accessToken;
 
   const hours = [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12,
-    13,
-    14,
-    15,
-    16,
-    17,
-    18,
-    19,
-    20,
-    21,
-    22,
-    23,
-    24,
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+    22, 23, 24,
   ];
 
   const handleShiftNameChange = (name, _id, shift, shiftName) => {
@@ -273,7 +251,8 @@ const Shift = ({
         </Name>
       ) : !past &&
         accessLevel === "regular" &&
-        firstName === currentUserName ? ( //request to be replaced
+        firstName ===
+          false /*currentUserName// replace false by currentUserName to let users make their shifts available */ ? ( //request to be replaced
         <Name>
           <span>{firstName.charAt(0).toUpperCase() + firstName.slice(1)}</span>
           <Select
