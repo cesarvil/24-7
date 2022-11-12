@@ -395,7 +395,7 @@ const Wrapper = styled.div`
     props.scheduleUsers && props.firstName
       ? props.status === "change"
         ? employeeColors.orange
-        : props.status === "error" || props.firstName === "Junior"
+        : props.status === "error" || props.firstName === "JUNIOR"
         ? "red"
         : employeeColors[
             props.scheduleUsers.filter(
