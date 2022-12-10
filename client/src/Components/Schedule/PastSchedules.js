@@ -48,7 +48,6 @@ const PastSchedule = () => {
         allDays &&
         currentUser &&
         allDays
-          .reverse()
           .filter((_, index) => index % 7 === 0) // amount of weeks. just using the index.
           .map((_, index) => {
             let weekIndex = index * 7;
