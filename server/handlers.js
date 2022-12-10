@@ -957,7 +957,7 @@ const calculateAdminHours = async (req, res) => {
       .toArray();
 
     let CurrentBiweekStartingIndex = getCurrentBiweekStartingIndex(hours);
-    let currentWeekStart = hours[CurrentBiweekStartingIndex]._id.idToDate();
+    let currentWeekStart = idToDate(hours[CurrentBiweekStartingIndex]._id);
 
     if (
       hours.length > 0 &&
