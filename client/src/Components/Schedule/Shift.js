@@ -396,7 +396,7 @@ const Wrapper = styled.div`
 
     if (
       props.scheduleUsers.filter((user) => props.firstName === user.firstName)
-        .length === 0
+        .length > 0
     ) {
       userExists = true;
     }
