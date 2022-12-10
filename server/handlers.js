@@ -143,9 +143,8 @@ const getSchedule = async (req, res) => {
         error: "getSchedule : No shifts in the currentSchedulebase",
       });
     } else {
-      let todayBiweekStartingIndex = getCurrentBiweekStartingIndex(
-        currentSchedule
-      );
+      let todayBiweekStartingIndex =
+        getCurrentBiweekStartingIndex(currentSchedule);
       let pastSchedule = [];
 
       if (todayBiweekStartingIndex === -1) {
@@ -958,6 +957,7 @@ const calculateAdminHours = async (req, res) => {
       .toArray();
 
     let CurrentBiweekStartingIndex = getCurrentBiweekStartingIndex(hours);
+    let currentWeekStart = hours[CurrentBiweekStartingIndex].id.idToDate();
 
     if (
       hours.length > 0 &&
@@ -1013,6 +1013,7 @@ const calculateAdminHours = async (req, res) => {
             hoursPerDay.pastTwoWeeks = hoursPerDay.pastTwoWeeks + shiftHours;
           }
         });
+
         return {
           username: username,
           userColor: color,
@@ -1024,6 +1025,7 @@ const calculateAdminHours = async (req, res) => {
       status: 200,
       success: true,
       hoursPerDay: allUserHours,
+      currentWeekStart: currentWeekStart,
     });
   } catch (err) {
     console.error(err);

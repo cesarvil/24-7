@@ -6,6 +6,7 @@ import { MdDarkMode, MdOutlineDarkMode } from "react-icons/md";
 
 const Profile = () => {
   const [hoursPerDay, setHoursPerDay] = useState(null);
+  const [currentWeekStart, setCurrentWeekStart] = useState(null);
   const { currentUser, darkMode, setDarkMode } = useContext(CurrentUserContext);
   useEffect(() => {
     const getHours = () => {
@@ -33,6 +34,7 @@ const Profile = () => {
               console.log(data.error);
             }
             setHoursPerDay(data.hoursPerDay);
+            setCurrentWeekStart(data.currentWeekStart);
           })
           .catch((err) => console.log(err));
       }
@@ -142,7 +144,7 @@ const Profile = () => {
                         <h1>Name:</h1> <h1>{user.username}</h1>
                       </AdminFlex>
                       <AdminFlex>
-                        <h1>Next 2 weeks:</h1>
+                        <h1>{currentWeekStart}:</h1>
                         <h1>{user.hoursPerDay.thisTwoWeeks} Hours</h1>
                       </AdminFlex>
                       <AdminFlex>
