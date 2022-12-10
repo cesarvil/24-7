@@ -960,9 +960,12 @@ const calculateAdminHours = async (req, res) => {
     let currentWeekStart = idToDate(hours[CurrentBiweekStartingIndex]._id)
       .toString()
       .slice(4, 15);
-    let currentWeekStart2 = idToDate(hours[CurrentBiweekStartingIndex + 7]._id)
-      .toString()
-      .slice(4, 15);
+    let currentWeekStart2 =
+      CurrentBiweekStartingIndex >= 14
+        ? idToDate(hours[CurrentBiweekStartingIndex - 14]._id)
+            .toString()
+            .slice(4, 15)
+        : "Past 2 weeks";
 
     if (
       hours.length > 0 &&
