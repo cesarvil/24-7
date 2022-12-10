@@ -10,7 +10,7 @@ const ActivateAccount = ({ email, setLoginError }) => {
   const handleSubmit = (ev) => {
     //handle activate account
     setActivationSuccess(false);
-    fetch("https://scheduler24-7.herokuapp.com/api/activation", {
+    fetch("http://localhost:8000/api/activation", {
       method: "PATCH",
       body: JSON.stringify({
         email: email,
@@ -39,7 +39,7 @@ const ActivateAccount = ({ email, setLoginError }) => {
   const handleSkipActivation = (ev) => {
     setActivationSuccess(false);
     console.log(email);
-    fetch("https://scheduler24-7.herokuapp.com/api/skip-activation", {
+    fetch("http://localhost:8000/api/skip-activation", {
       method: "PATCH",
       body: JSON.stringify({
         email: email,

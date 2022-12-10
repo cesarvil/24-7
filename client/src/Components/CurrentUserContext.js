@@ -31,7 +31,7 @@ export const CurrentUserProvider = ({ children }) => {
 
   const getCurrentUserInfo = (bToken) => {
     //handle loggin
-    fetch("https://scheduler24-7.herokuapp.com/api/user-info", {
+    fetch("http://localhost:8000/api/user-info", {
       method: "GET",
       headers: {
         authorization: `bearer ${bToken}`,

@@ -6,7 +6,7 @@ const ColorList = ({ handlePickColor, chosenColor, scheduleId }) => {
 
   useEffect(() => {
     const getAvailableColors = () => {
-      fetch(`https://scheduler24-7.herokuapp.com/api/colors/${scheduleId}`)
+      fetch(`http://localhost:8000/api/colors/${scheduleId}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.error) {

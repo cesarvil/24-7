@@ -32,7 +32,7 @@ const Schedule = () => {
 
     const getSchedule = () => {
       const scheduleId = currentUser.schedule.scheduleId;
-      fetch(`https://scheduler24-7.herokuapp.com/api/schedule/${scheduleId}`)
+      fetch(`http://localhost:8000/api/schedule/${scheduleId}`)
         .then((res) => res.json())
         .then((data) => {
           setAllDays(data.currentSchedule);
@@ -42,7 +42,7 @@ const Schedule = () => {
 
     const getUsersInSchedule = () => {
       let scheduleId = currentUser.schedule.scheduleId;
-      fetch(`https://scheduler24-7.herokuapp.com/api/users/${scheduleId}`)
+      fetch(`http://localhost:8000/api/users/${scheduleId}`)
         .then((res) => res.json())
         .then((data) => {
           setScheduleUsers(data.usersScheduleProperties);
@@ -60,7 +60,7 @@ const Schedule = () => {
   const handleAddWeek = () => {
     //function to add more weeks when clicking the add week button
 
-    fetch("https://scheduler24-7.herokuapp.com/api/new-week", {
+    fetch("http://localhost:8000/api/new-week", {
       method: "POST",
       body: JSON.stringify({ scheduleId: currentUser.schedule.scheduleId }),
       headers: {
@@ -79,7 +79,7 @@ const Schedule = () => {
 
   const handleDeleteLastTwoWeeks = () => {
     //function to add more weeks when clicking the add week button
-    fetch("https://scheduler24-7.herokuapp.com/api/schedule-deletion", {
+    fetch("http://localhost:8000/api/schedule-deletion", {
       method: "POST",
       body: JSON.stringify({ scheduleId: currentUser.schedule.scheduleId }),
       headers: {
@@ -101,9 +101,7 @@ const Schedule = () => {
     const scheduleId = currentUser.schedule.scheduleId;
     // const email = currentUser.email;
     const email = "cezarvillao@gmail.com";
-    fetch(
-      `https://scheduler24-7.herokuapp.com/api/email/${scheduleId}/${email}`
-    )
+    fetch(`http://localhost:8000/api/email/${scheduleId}/${email}`)
       .then((res) => res.json())
       .then((data) => {})
       .catch((err) => console.log(err));
