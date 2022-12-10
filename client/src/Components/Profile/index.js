@@ -133,7 +133,7 @@ const Profile = () => {
             </UserContainer>
 
             <AdminUsersContainer>
-              {currentUser.schedule.accessLevel === "admin" &&
+              {currentUser.schedule.accessLevel.includes("admin") &&
                 hoursPerDay &&
                 hoursPerDay.length > 0 &&
                 hoursPerDay.map((user) => {
