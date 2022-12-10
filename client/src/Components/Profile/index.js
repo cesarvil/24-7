@@ -27,7 +27,7 @@ const Profile = () => {
             setHoursPerDay(data.hoursPerDay);
           })
           .catch((err) => console.log(err));
-      } else if (accessLevel === "admin") {
+      } else if (accessLevel === "admin" || accessLevel === "adminViewOnly") {
         fetch(`https://scheduler24-7.herokuapp.com/api/hours/${scheduleId}/`)
           .then((res) => res.json())
           .then((data) => {
