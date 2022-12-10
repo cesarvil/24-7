@@ -393,7 +393,7 @@ const Wrapper = styled.div`
   /* filtering the user that matches the selected name, then taking the first element of the array, then the usercolor, then taking the color from employeeColors */
   background: ${(props) => {
     let userExists = false;
-
+    // when deleting an user, have to make sure to do this check for user.firstName. Else getting error for past schedules
     if (
       props.scheduleUsers.filter((user) => props.firstName === user.firstName)
         .length > 0
