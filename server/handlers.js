@@ -957,7 +957,12 @@ const calculateAdminHours = async (req, res) => {
       .toArray();
 
     let CurrentBiweekStartingIndex = getCurrentBiweekStartingIndex(hours);
-    let currentWeekStart = idToDate(hours[CurrentBiweekStartingIndex]._id);
+    let currentWeekStart = idToDate(hours[CurrentBiweekStartingIndex]._id)
+      .toString()
+      .slice(4, 15);
+    let currentWeekStart2 = idToDate(hours[CurrentBiweekStartingIndex + 7]._id)
+      .toString()
+      .slice(4, 15);
 
     if (
       hours.length > 0 &&
@@ -1018,7 +1023,6 @@ const calculateAdminHours = async (req, res) => {
           username: username,
           userColor: color,
           hoursPerDay: hoursPerDay,
-          currentWeekStart: currentWeekStart,
         };
       });
     }
@@ -1026,7 +1030,8 @@ const calculateAdminHours = async (req, res) => {
       status: 200,
       success: true,
       hoursPerDay: allUserHours,
-      currentWeekStart: "currentWeekStart",
+      currentWeekStart: currentWeekStart,
+      currentWeekStart2: currentWeekStart2,
     });
   } catch (err) {
     console.error(err);
@@ -1166,3 +1171,5 @@ module.exports = {
   calculateAdminHours,
   sendSchedule,
 };
+
+//schedule24-7 is for heroku server
