@@ -391,18 +391,28 @@ const Wrapper = styled.div`
   border: 1px gray solid;
   padding: 1px;
   /* filtering the user that matches the selected name, then taking the first element of the array, then the usercolor, then taking the color from employeeColors */
-  background: ${(props) =>
-    props.scheduleUsers && props.firstName
+  background: ${(props) => {
+    let userExists = false;
+
+    if (
+      props.scheduleUsers.filter((user) => props.firstName === user.firstName)
+        .length === 0
+    ) {
+      userExists = true;
+    }
+
+    return props.scheduleUsers && props.firstName && userExists
       ? props.status === "change"
         ? employeeColors.orange
-        : props.status === "error" || props.firstName === "JUNIOR"
+        : props.status === "error"
         ? "red"
         : employeeColors[
             props.scheduleUsers.filter(
               (user) => props.firstName === user.firstName
             )[0].userColor
           ]
-      : "gray"};
+      : "gray";
+  }};
   span {
     margin: 5px;
   }
