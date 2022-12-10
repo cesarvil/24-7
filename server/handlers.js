@@ -1018,6 +1018,7 @@ const calculateAdminHours = async (req, res) => {
           username: username,
           userColor: color,
           hoursPerDay: hoursPerDay,
+          currentWeekStart: currentWeekStart,
         };
       });
     }
