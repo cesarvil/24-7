@@ -318,7 +318,7 @@ const AdminUsers = styled.div`
   justify-content: flex-start;
   margin: 5px 0;
 
-  min-width: 300px;
+  min-width: 350px;
   h1 {
     border: 1px gray solid;
   }
